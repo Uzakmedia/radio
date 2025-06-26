@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>UzakMedia - Radyo Yayını</title>
 
-  <!-- Streemlion player CSS -->
+  <!-- Player CSS -->
   <link href="https://radio.streemlion.com:4670/media/static/css/player/base.css" rel="stylesheet" type="text/css" />
   <link href="https://radio.streemlion.com:4670/media/static/css/player/style-4.css" rel="stylesheet" type="text/css" />
   <link href="https://radio.streemlion.com:4670/media/static/css/ui/jquery.ui.slider.css" rel="stylesheet" type="text/css" />
@@ -31,13 +31,48 @@
       font-size: 0.8rem;
       color: #888;
     }
+    #chat {
+      width: 100%;
+      max-width: 500px;
+      margin: 40px auto;
+      background: #222;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: left;
+    }
+    #messages {
+      height: 300px;
+      overflow-y: auto;
+      background: #000;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+    }
+    #chat input, #chat button {
+      padding: 8px;
+      font-size: 1rem;
+    }
+    #chat input {
+      width: 70%;
+      border: none;
+      border-radius: 4px;
+    }
+    #chat button {
+      width: 25%;
+      margin-left: 5%;
+      background: #444;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
   <h1>🎧 UzakMedia</h1>
   <p>Her Cumartesi 22:00–01:00 arasında <strong>Fısıltı</strong> yayında.</p>
 
-  <!-- Streemlion Player -->
+  <!-- Player -->
   <div id="rtJpID-1"></div>
   <div class="rtplwrapperForIe">
     <div id="rtplayer-1" class="rtplmain_window gradient_style-4">
@@ -49,23 +84,70 @@
     </div>
   </div>
 
-  <!-- jQuery ve Player JS -->
+  <!-- Chat Bölümü -->
+  <div id="chat">
+    <div id="messages"></div>
+    <input type="text" id="msg" placeholder="Mesaj yaz..." />
+    <button onclick="sendMessage()">Gönder</button>
+  </div>
+
+  <!-- Firebase (demo config) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAacChat-Demo-KEYXX",
+      authDomain: "anon-chat-demo.firebaseapp.com",
+      databaseURL: "https://anon-chat-demo-default-rtdb.firebaseio.com",
+      projectId: "anon-chat-demo",
+      storageBucket: "anon-chat-demo.appspot.com",
+      messagingSenderId: "1234567890",
+      appId: "1:1234567890:web:demo"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let nickname = localStorage.getItem("nickname");
+    if (!nickname) {
+      nickname = prompt("Takma adını yaz:") || "Anon" + Math.floor(Math.random()*1000);
+      localStorage.setItem("nickname", nickname);
+    }
+
+    const messagesRef = db.ref("messages");
+    messagesRef.on("child_added", snap => {
+      const msg = snap.val();
+      const div = document.createElement("div");
+      div.innerText = msg.name + ": " + msg.text;
+      document.getElementById("messages").appendChild(div);
+      document.getElementById("messages").scrollTop = 9999;
+    });
+
+    function sendMessage() {
+      const text = document.getElementById("msg").value;
+      if (text.trim() !== "") {
+        messagesRef.push({ name: nickname, text });
+        document.getElementById("msg").value = "";
+      }
+    }
+  </script>
+
+  <!-- Player JS -->
   <script>
     if (typeof jQuery == 'undefined') {
       var i = "i";
       document.write('<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js"></scr' + i + 'pt>');
     }
   </script>
-  <script type="text/javascript" src="https://radio.streemlion.com:4670/media/static/js/jplayer/jquery.jplayer.min.js"></script>
-  <script type="text/javascript" src="https://radio.streemlion.com:4670/media/static/js/jplayer/jquery-ui-1.10.2.custom.min.js"></script>
-  <script type="text/javascript" src="https://radio.streemlion.com:4670/media/static/js/jplayer/modernizr.js"></script>
-  <script type="text/javascript" src="https://radio.streemlion.com:4670/media/static/js/jplayer/rt_pl.js"></script>
+  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/jquery.jplayer.min.js"></script>
+  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/jquery-ui-1.10.2.custom.min.js"></script>
+  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/modernizr.js"></script>
+  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/rt_pl.js"></script>
   <script>
     $(document).ready(function () {
       new RTPlayer(
-        1,                  // Player ID
-        80,                 // Ses seviyesi (0–100)
-        true,               // Otomatik başlat
+        1,
+        80,
+        true,
         "https://radio.streemlion.com:4670",
         "mp3",
         { mp3: "https://radio.streemlion.com:4685/stream" },
