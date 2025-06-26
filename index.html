@@ -49,23 +49,23 @@
     </div>
   </div>
 
-  <!-- jQuery ve player JS -->
+  <!-- jQuery ve Player JS -->
   <script>
     if (typeof jQuery == 'undefined') {
       var i = "i";
       document.write('<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js"></scr' + i + 'pt>');
     }
   </script>
-  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/jquery.jplayer.min.js"></script>
-  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/jquery-ui-1.10.2.custom.min.js"></script>
-  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/modernizr.js"></script>
-  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/rt_pl.js"></script>
+  <script type="text/javascript" src="https://radio.streemlion.com:4670/media/static/js/jplayer/jquery.jplayer.min.js"></script>
+  <script type="text/javascript" src="https://radio.streemlion.com:4670/media/static/js/jplayer/jquery-ui-1.10.2.custom.min.js"></script>
+  <script type="text/javascript" src="https://radio.streemlion.com:4670/media/static/js/jplayer/modernizr.js"></script>
+  <script type="text/javascript" src="https://radio.streemlion.com:4670/media/static/js/jplayer/rt_pl.js"></script>
   <script>
     $(document).ready(function () {
       new RTPlayer(
-        1,
-        50,
-        true,
+        1,                  // Player ID
+        80,                 // Ses seviyesi (0–100)
+        true,               // Otomatik başlat
         "https://radio.streemlion.com:4670",
         "mp3",
         { mp3: "https://radio.streemlion.com:4685/stream" },
