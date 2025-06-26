@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UzakMedia - Radyo Yayını</title>
+
+  <!-- Streemlion player CSS -->
+  <link href="https://radio.streemlion.com:4670/media/static/css/player/base.css" rel="stylesheet" type="text/css" />
+  <link href="https://radio.streemlion.com:4670/media/static/css/player/style-4.css" rel="stylesheet" type="text/css" />
+  <link href="https://radio.streemlion.com:4670/media/static/css/ui/jquery.ui.slider.css" rel="stylesheet" type="text/css" />
+
+  <style>
+    body {
+      background-color: #111;
+      color: #eee;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+    }
+    footer {
+      margin-top: 60px;
+      font-size: 0.8rem;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎧 UzakMedia</h1>
+  <p>Her Cumartesi 22:00–01:00 arasında <strong>Fısıltı</strong> yayında.</p>
+
+  <!-- Streemlion Player -->
+  <div id="rtJpID-1"></div>
+  <div class="rtplwrapperForIe">
+    <div id="rtplayer-1" class="rtplmain_window gradient_style-4">
+      <a id="button_play_stop-1" class="rtplbutton_play_stop button_play_stop_style-4" href="#"></a>
+      <div id="current_time-1" class="rtplcurrent_time">00:00:00</div>
+      <a id="rtplmute-1" class="rtplmute button_mute_style-4" href="#"></a>
+      <div id="rtplvolume-1" class="rtplvolume"></div>
+      <a id="rtplmaxvol-1" class="rtplmaxvol button_max_vol_style-4" href="#"></a>
+    </div>
+  </div>
+
+  <!-- jQuery ve player JS -->
+  <script>
+    if (typeof jQuery == 'undefined') {
+      var i = "i";
+      document.write('<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js"></scr' + i + 'pt>');
+    }
+  </script>
+  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/jquery.jplayer.min.js"></script>
+  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/jquery-ui-1.10.2.custom.min.js"></script>
+  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/modernizr.js"></script>
+  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/rt_pl.js"></script>
+  <script>
+    $(document).ready(function () {
+      new RTPlayer(
+        1,
+        50,
+        true,
+        "https://radio.streemlion.com:4670",
+        "mp3",
+        { mp3: "https://radio.streemlion.com:4685/stream" },
+        "en"
+      );
+    });
+  </script>
+
+  <footer>© 2025 UzakMedia - uzakmedia.xyz</footer>
+</body>
+</html>
