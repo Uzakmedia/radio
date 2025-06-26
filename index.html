@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Uzak Media - Radyo Yayını</title>
+  <title>UzakMedia - Radyo Yayını</title>
 
   <!-- Player CSS -->
   <link href="https://radio.streemlion.com:4670/media/static/css/player/base.css" rel="stylesheet" type="text/css" />
@@ -77,11 +77,16 @@
       color: red;
       margin-left: 10px;
     }
+    .timestamp {
+      color: #777;
+      font-size: 0.7rem;
+      margin-left: 6px;
+    }
   </style>
 </head>
 <body>
-  <h1>🎧 Uzak Media</h1>
-  <p>Her Cumartesi 22:00–01:00 arasında <strong>"Fısıltı"</strong> yayında.</p>
+  <h1>🎧 UzakMedia</h1>
+  <p>Her Cumartesi 22:00–01:00 arasında <strong>Fısıltı</strong> yayında.</p>
 
   <!-- Player -->
   <div id="rtJpID-1"></div>
@@ -102,18 +107,18 @@
     <button onclick="sendMessage()">Gönder</button>
   </div>
 
-  <!-- Firebase (demo config) -->
+  <!-- Firebase with your config -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyAacChat-Demo-KEYXX",
-      authDomain: "anon-chat-demo.firebaseapp.com",
-      databaseURL: "https://anon-chat-demo-default-rtdb.firebaseio.com",
-      projectId: "anon-chat-demo",
-      storageBucket: "anon-chat-demo.appspot.com",
-      messagingSenderId: "1234567890",
-      appId: "1:1234567890:web:demo"
+      apiKey: "AIzaSyA4w0aZLXXJNznxYx4XVe3in-U4wRdkNsc",
+      authDomain: "uzakmedia-chat.firebaseapp.com",
+      databaseURL: "https://uzakmedia-chat-default-rtdb.firebaseio.com",
+      projectId: "uzakmedia-chat",
+      storageBucket: "uzakmedia-chat.firebasestorage.app",
+      messagingSenderId: "268248700773",
+      appId: "1:268248700773:web:b81a190e0688e027e5738c"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
@@ -126,6 +131,21 @@
       localStorage.setItem("nickname", nickname);
     }
 
+    const emojiMap = {
+      ":)": "😊",
+      ":(": "😞",
+      ":D": "😄",
+      ":P": "😜",
+      "<3": "❤️"
+    };
+
+    function formatEmojis(text) {
+      for (let key in emojiMap) {
+        text = text.split(key).join(emojiMap[key]);
+      }
+      return text;
+    }
+
     const messagesRef = db.ref("messages");
     messagesRef.limitToLast(100).on("child_added", snap => {
       const msg = snap.val();
@@ -134,8 +154,16 @@
       div.setAttribute("data-key", snap.key);
 
       const contentSpan = document.createElement("span");
-      contentSpan.textContent = `${msg.name}: ${msg.text}`;
+      const formattedText = formatEmojis(msg.text);
+      const timestamp = new Date(msg.timestamp || Date.now()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      contentSpan.textContent = `${msg.name}: ${formattedText}`;
+
+      const timeSpan = document.createElement("span");
+      timeSpan.className = "timestamp";
+      timeSpan.textContent = timestamp;
+
       div.appendChild(contentSpan);
+      div.appendChild(timeSpan);
 
       if (modUsers.includes(nickname.toLowerCase())) {
         const del = document.createElement("span");
@@ -155,11 +183,20 @@
       if (msgElem) msgElem.remove();
     });
 
+    let lastSent = 0;
+
     function sendMessage() {
+      const now = Date.now();
+      if (now - lastSent < 3000) {
+        alert("Lütfen mesajlar arasında en az 3 saniye bekleyin.");
+        return;
+      }
+
       const text = document.getElementById("msg").value;
       if (text.trim() !== "") {
-        messagesRef.push({ name: nickname, text });
+        messagesRef.push({ name: nickname, text, timestamp: now });
         document.getElementById("msg").value = "";
+        lastSent = now;
       }
     }
   </script>
