@@ -16,13 +16,6 @@
       align-items: center;
     }
 
-    iframe {
-      width: 300px;
-      height: 100px;
-      border: none;
-      margin-top: 20px;
-    }
-
     #chatContainer {
       margin-top: 20px;
       width: 100%;
@@ -68,85 +61,13 @@
 
   <h2>🎙️ Uzak Media - Canlı Yayın</h2>
 
-  <!-- Radyo Player -->
-  <audio id="radioPlayer" autoplay muted>
-    <source src="https://radio.streemlion.com:4670/stream" type="audio/mpeg">
-    Tarayıcınız ses oynatmayı desteklemiyor.
-  </audio>
-
-  <!-- Chat -->
-  <div id="chatContainer">
-    <div id="messages"></div>
-    <input type="text" id="nicknameInput" placeholder="Takma adını buraya yaz..." />
-    <input type="text" id="messageInput" placeholder="Mesajını yaz..." disabled />
-    <button id="sendButton" onclick="sendMessage()" disabled>Gönder</button>
-  </div>
-
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyA4w0aZLXXJNznxYx4XVe3in-U4wRdkNsc",
-      authDomain: "uzakmedia-chat.firebaseapp.com",
-      projectId: "uzakmedia-chat",
-      storageBucket: "uzakmedia-chat.appspot.com",
-      messagingSenderId: "268248700773",
-      appId: "1:268248700773:web:b81a190e0688e027e5738c",
-      databaseURL: "https://uzakmedia-chat-default-rtdb.europe-west1.firebasedatabase.app"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const messagesRef = ref(db, "messages");
-
-    let nickname = "";
-
-    document.getElementById("nicknameInput").addEventListener("input", () => {
-      nickname = document.getElementById("nicknameInput").value.trim();
-      const enable = nickname.length > 1;
-      document.getElementById("messageInput").disabled = !enable;
-      document.getElementById("sendButton").disabled = !enable;
-    });
-
-    window.sendMessage = function () {
-      const msg = document.getElementById("messageInput").value.trim();
-      if (msg.length > 0 && nickname.length > 1) {
-        push(messagesRef, {
-          sender: nickname,
-          text: msg,
-          timestamp: Date.now()
-        });
-        document.getElementById("messageInput").value = "";
-      }
-    };
-
-    onChildAdded(messagesRef, (data) => {
-      const msg = data.val();
-      const p = document.createElement("p");
-      p.textContent = `${msg.sender}: ${msg.text}`;
-      document.getElementById("messages").appendChild(p);
-      document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
-    });
-
-    // Autoplay hack: mute'yi kaldırmak için farklı yollar
-    function enableAutoplay() {
-      const player = document.getElementById("radioPlayer");
-      player.muted = false;
-      player.play().catch(() => {});
-    }
-
-    // İlk tıkta başlat
-    window.addEventListener("click", enableAutoplay, { once: true });
-
-    // Sayfa görünür olunca (örneğin sekmeden geri dönünce) başlat
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible") {
-        enableAutoplay();
-      }
-    });
-  </script>
-
-</body>
-</html>
+  <!-- Radyo Player (Streemlion widget) -->
+  <div style="width: 300px;" id="sc-player">
+    <div
+      is="player"
+      lang="en"
+      api-url="https://radio.streemlion.com:4670/api/v2"
+      server-id="1"
+      station-name="Uzak Media"
+      station-url=""
+      imagecontaine
