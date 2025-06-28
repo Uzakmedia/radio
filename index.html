@@ -17,12 +17,17 @@
     }
 
     #sc-player {
+      width: 100%;
+      max-width: 700px;
+      height: 90px;
       margin-bottom: 30px;
+      display: flex;
+      justify-content: center;
     }
 
     #chatContainer {
-      width: 100%;
-      max-width: 500px;
+      width: 90%;
+      max-width: 700px;
     }
 
     #messages {
@@ -59,4 +64,117 @@
       background-color: #5f9;
       color: #000;
       border: none;
-      border-radi
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Streemlion Widget Player - EN ÜSTTE -->
+  <div id="sc-player">
+    <div
+      is="player"
+      lang="en"
+      api-url="https://radio.streemlion.com:4670/api/v2"
+      server-id="1"
+      station-name="Uzak Media"
+      imagecontainer="bottom"
+      imagecontainer-bg="#78a3b5"
+      imagecontainer-bg-opacity="1"
+      controlscontainer="bottom"
+      controlscontainer-bg="#d6d6d6"
+      controlscontainer-bg-opacity="1"
+      controlscontainer-bg-img="https://radio.streemlion.com:4670/media/player_bg/player_bg.jpg"
+      :show-history="false"
+      :show-share="true"
+      :share="['facebook','telegram','twitter']"
+      :show-dj="false"
+      :show-image="false"
+      play-button-color="#35495e"
+      visualizer-outline-color="#37679a"
+      visualizer-bar-width="1"
+      :channels-displayed="[1]"
+      :show-vote="true"
+      vote-buttons-color="#35495e"
+      progress-bar-color="#35495e"
+      progress-bar-bg-color="#41b883"
+      progress-bar-bg-opacity="0.1"
+      progress-bar-bg-height="25"
+      progress-font-color="#FFFFFF"
+      progress-font-size="12"
+      progress-bar-bg-radius="10"
+      progress-bar-bg-border="#F5F5F5"
+      player-width="100%"
+    ></div>
+  </div>
+
+  <!-- Chat -->
+  <div id="chatContainer">
+    <div id="messages"></div>
+    <input type="text" id="nicknameInput" placeholder="Takma adını yaz..." />
+    <input type="text" id="messageInput" placeholder="Mesajını yaz..." disabled />
+    <button id="sendButton" onclick="sendMessage()" disabled>Gönder</button>
+  </div>
+
+  <!-- Firebase scripts (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+  <!-- Streemlion widget player script -->
+  <script src="https://radio.streemlion.com:4670/media/static/js/sc_player/sc_player.js"></script>
+
+  <!-- Chat script -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA4w0aZLXXJNznxYx4XVe3in-U4wRdkNsc",
+      authDomain: "uzakmedia-chat.firebaseapp.com",
+      databaseURL: "https://uzakmedia-chat-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "uzakmedia-chat",
+      storageBucket: "uzakmedia-chat.appspot.com",
+      messagingSenderId: "268248700773",
+      appId: "1:268248700773:web:b81a190e0688e027e5738c"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const messagesRef = db.ref("messages");
+
+    let nickname = "";
+
+    document.getElementById("nicknameInput").addEventListener("input", () => {
+      nickname = document.getElementById("nicknameInput").value.trim();
+      const enable = nickname.length > 1;
+      document.getElementById("messageInput").disabled = !enable;
+      document.getElementById("sendButton").disabled = !enable;
+    });
+
+    window.sendMessage = function () {
+      const text = document.getElementById("messageInput").value.trim();
+      if (text && nickname.length > 1) {
+        messagesRef.push({
+          sender: nickname,
+          text: text,
+          timestamp: Date.now()
+        });
+        document.getElementById("messageInput").value = "";
+      }
+    };
+
+    messagesRef.limitToLast(50).on("child_added", (data) => {
+      const msg = data.val();
+      const p = document.createElement("p");
+
+      let className = "";
+      const sender = msg.sender.toLowerCase();
+      if (sender === "admin") className = "admin";
+      else if (["mod1", "mod2", "mod3"].includes(sender)) className = "mod";
+
+      p.innerHTML = `<span class="${className}">${msg.sender}:</span> ${msg.text}`;
+      document.getElementById("messages").appendChild(p);
+      document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
+    });
+  </script>
+
+</body>
+</html>
