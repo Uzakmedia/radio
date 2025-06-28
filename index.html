@@ -59,26 +59,14 @@
       border-radius: 5px;
       cursor: pointer;
     }
-
-    #nicknameInput::placeholder {
-      color: #aaa;
-    }
   </style>
 </head>
 <body>
 
   <h2>🎙️ Uzak Media - Canlı Yayın</h2>
 
-  <!-- Chat -->
-  <div id="chatContainer">
-    <div id="messages"></div>
-    <input type="text" id="nicknameInput" placeholder="Takma adını buraya yaz..." />
-    <input type="text" id="messageInput" placeholder="Mesajını yaz..." disabled />
-    <button id="sendButton" onclick="sendMessage()" disabled>Gönder</button>
-  </div>
-
-  <!-- Widget Player (EN ALTA KOYULACAK) -->
-  <div style="width: 300px; margin-top: 40px;" id="sc-player">
+  <!-- Streemlion Widget Player -->
+  <div style="width: 300px; margin-top: 20px;" id="sc-player">
     <div
       is="player"
       lang="en"
@@ -115,10 +103,22 @@
     ></div>
   </div>
 
-  <!-- Firebase SDK -->
+  <!-- Chat -->
+  <div id="chatContainer">
+    <div id="messages"></div>
+    <input type="text" id="nicknameInput" placeholder="Takma adını yaz..." />
+    <input type="text" id="messageInput" placeholder="Mesajını yaz..." disabled />
+    <button id="sendButton" onclick="sendMessage()" disabled>Gönder</button>
+  </div>
+
+  <!-- Firebase scripts (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
+  <!-- Streemlion widget player script -->
+  <script src="https://radio.streemlion.com:4670/media/static/js/sc_player/sc_player.js"></script>
+
+  <!-- Chat script -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyA4w0aZLXXJNznxYx4XVe3in-U4wRdkNsc",
@@ -130,47 +130,4 @@
       appId: "1:268248700773:web:b81a190e0688e027e5738c"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const messagesRef = db.ref("messages");
-
-    let nickname = "";
-
-    document.getElementById("nicknameInput").addEventListener("input", () => {
-      nickname = document.getElementById("nicknameInput").value.trim();
-      const enable = nickname.length > 1;
-      document.getElementById("messageInput").disabled = !enable;
-      document.getElementById("sendButton").disabled = !enable;
-    });
-
-    window.sendMessage = function () {
-      const msg = document.getElementById("messageInput").value.trim();
-      if (msg && nickname.length > 1) {
-        messagesRef.push({
-          sender: nickname,
-          text: msg,
-          timestamp: Date.now()
-        });
-        document.getElementById("messageInput").value = "";
-      }
-    };
-
-    messagesRef.limitToLast(50).on("child_added", (snapshot) => {
-      const msg = snapshot.val();
-      const p = document.createElement("p");
-
-      let className = "";
-      if (msg.sender.toLowerCase() === "admin") className = "admin";
-      else if (["mod1", "mod2", "mod3"].includes(msg.sender.toLowerCase())) className = "mod";
-
-      p.innerHTML = `<span class="${className}">${msg.sender}:</span> ${msg.text}`;
-      document.getElementById("messages").appendChild(p);
-      document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
-    });
-  </script>
-
-  <!-- Streemlion Player Script (EN SONDA OLMALI) -->
-  <script src="https://radio.streemlion.com:4670/media/static/js/sc_player/sc_player.js"></script>
-
-</body>
-</html>
+    firebase.initializeApp(firebaseCo
