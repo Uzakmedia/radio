@@ -68,7 +68,7 @@
 
   <h2>🎙️ Uzak Media - Canlı Yayın</h2>
 
-  <!-- Radyo Player (Autoplay için muted + script eklenecek) -->
+  <!-- Radyo Player -->
   <audio id="radioPlayer" autoplay muted>
     <source src="https://radio.streemlion.com:4670/stream" type="audio/mpeg">
     Tarayıcınız ses oynatmayı desteklemiyor.
@@ -103,7 +103,6 @@
 
     let nickname = "";
 
-    // Nickname yazıldığında mesaj kutusu aktif hale gelir
     document.getElementById("nicknameInput").addEventListener("input", () => {
       nickname = document.getElementById("nicknameInput").value.trim();
       const enable = nickname.length > 1;
@@ -111,7 +110,6 @@
       document.getElementById("sendButton").disabled = !enable;
     });
 
-    // Mesaj gönder
     window.sendMessage = function () {
       const msg = document.getElementById("messageInput").value.trim();
       if (msg.length > 0 && nickname.length > 1) {
@@ -124,7 +122,6 @@
       }
     };
 
-    // Yeni mesajları dinle
     onChildAdded(messagesRef, (data) => {
       const msg = data.val();
       const p = document.createElement("p");
@@ -133,12 +130,22 @@
       document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
     });
 
-    // Autoplay fix: kullanıcı sayfaya tıklayınca sesi başlat
-    window.addEventListener("click", () => {
+    // Autoplay hack: mute'yi kaldırmak için farklı yollar
+    function enableAutoplay() {
       const player = document.getElementById("radioPlayer");
       player.muted = false;
       player.play().catch(() => {});
-    }, { once: true });
+    }
+
+    // İlk tıkta başlat
+    window.addEventListener("click", enableAutoplay, { once: true });
+
+    // Sayfa görünür olunca (örneğin sekmeden geri dönünce) başlat
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        enableAutoplay();
+      }
+    });
   </script>
 
 </body>
