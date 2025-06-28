@@ -5,54 +5,65 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Uzak Media</title>
 
-  <!-- Streemlion Mini Player CSS -->
-  <link href="https://radio.streemlion.com:4670/media/static/css/player/base.css" rel="stylesheet" type="text/css" />
-  <link href="https://radio.streemlion.com:4670/media/static/css/player/style-4-mini.css" rel="stylesheet" type="text/css" />
-  <link href="https://radio.streemlion.com:4670/media/static/css/ui/jquery.ui.slider.css" rel="stylesheet" type="text/css" />
-
+  <!-- Streemlion CSS -->
+  <link href="https://radio.streemlion.com:4670/media/static/css/player/base.css" rel="stylesheet" />
+  <link href="https://radio.streemlion.com:4670/media/static/css/player/style-4-mini.css" rel="stylesheet" />
+  <link href="https://radio.streemlion.com:4670/media/static/css/ui/jquery.ui.slider.css" rel="stylesheet" />
+  
+  <!-- Sayfa Stili -->
   <style>
     body {
+      background-color: #111;
+      color: #fff;
+      font-family: sans-serif;
       margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4eee4; /* Krem tonlu zemin */
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      padding: 40px 20px;
       text-align: center;
     }
 
-    .logo {
-      max-width: 80%;
-      width: 300px;
-      margin-bottom: 30px;
+    h1 {
+      margin-bottom: 40px;
+      font-size: 36px;
     }
 
-    .player-container {
-      background-color: rgba(0, 0, 0, 0.05);
-      padding: 15px 20px;
-      border-radius: 15px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-
-    @media (max-width: 480px) {
-      .logo {
-        width: 220px;
-      }
-
-      .player-container iframe {
-        width: 260px !important;
-      }
+    #rtplayer-1 {
+      display: inline-block;
     }
   </style>
 </head>
 <body>
-  <img src="D4CE08D6-2212-4109-AAAB-AE96BC0349C3.png" alt="Uzak Media Logo" class="logo" />
 
-  <div class="player-container">
-    <iframe src="https://radio.streemlion.com:4670/index.html?sid=1" width="300" height="60" frameborder="0" scrolling="no"></iframe>
+  <h1>Uzak Media</h1>
+
+  <!-- Streemlion Mini Player -->
+  <div id="rtJpID-1"></div>
+  <div class="rtplwrapperForIe-mini">
+    <div id="rtplayer-1" class="rtplmain_window-mini gradient_style-4-mini">
+      <a id="button_play_stop-1" class="rtplbutton_play_stop-mini button_play_stop_style-4-mini" href="#"></a>
+      <div id="current_time-1" class="rtplcurrent_time-mini">00:00:00</div>
+      <a id="rtplmute-1" class="rtplmute-mini button_mute_style-4-mini" href="#"></a>
+      <div id="rtplvolume-1" class="rtplvolume-mini"></div>
+      <a id="rtplmaxvol-1" class="rtplmaxvol-mini button_max_vol_style-4-mini" href="#"></a>
+    </div>
   </div>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+
+  <!-- Streemlion Scripts -->
+  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/jquery.jplayer.min.js"></script>
+  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/jquery-ui-1.10.2.custom.min.js"></script>
+  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/modernizr.js"></script>
+  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/rt_pl.js"></script>
+
+  <!-- Player Başlat -->
+  <script>
+    $(document).ready(function(){
+      new RTPlayer(1, 90, true, "https://radio.streemlion.com:4670", "mp3", {
+        "mp3": "https://radio.streemlion.com:4685/stream"
+      }, "en");
+    });
+  </script>
+
 </body>
 </html>
