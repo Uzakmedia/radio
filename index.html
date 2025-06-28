@@ -5,12 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Uzak Media</title>
 
-  <!-- Streemlion Mini Player CSS -->
+  <!-- ✅ jQuery DOĞRUDAN YÜKLENDİ -->
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+
+  <!-- ✅ Streemlion Mini Player CSS -->
   <link href="https://radio.streemlion.com:4670/media/static/css/player/base.css" rel="stylesheet" type="text/css" />
   <link href="https://radio.streemlion.com:4670/media/static/css/player/style-4-mini.css" rel="stylesheet" type="text/css" />
   <link href="https://radio.streemlion.com:4670/media/static/css/ui/jquery.ui.slider.css" rel="stylesheet" type="text/css" />
 
-  <!-- Sayfa Stili -->
   <style>
     body {
       font-family: sans-serif;
@@ -97,13 +99,7 @@
     <button id="sendButton" onclick="sendMessage()" disabled>Gönder</button>
   </div>
 
-  <!-- ✅ STREEMLION SCRIPTLER -->
-  <script>
-    if (typeof jQuery == 'undefined') {
-      var i = "i";
-      document.write('<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js"></scr' + i + 'pt>');
-    }
-  </script>
+  <!-- ✅ STREEMLION JS -->
   <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/jquery.jplayer.min.js"></script>
   <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/jquery-ui-1.10.2.custom.min.js"></script>
   <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/modernizr.js"></script>
