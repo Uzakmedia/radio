@@ -2,230 +2,144 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>UzakMedia - Radyo Yayını</title>
-
-  <!-- Player CSS -->
-  <link href="https://radio.streemlion.com:4670/media/static/css/player/base.css" rel="stylesheet" type="text/css" />
-  <link href="https://radio.streemlion.com:4670/media/static/css/player/style-4.css" rel="stylesheet" type="text/css" />
-  <link href="https://radio.streemlion.com:4670/media/static/css/ui/jquery.ui.slider.css" rel="stylesheet" type="text/css" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Uzak Media</title>
   <style>
     body {
+      font-family: sans-serif;
       background-color: #111;
-      color: #eee;
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      padding: 40px;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
+
+    iframe {
+      width: 300px;
+      height: 100px;
+      border: none;
+      margin-top: 20px;
     }
-    p {
-      font-size: 1.1rem;
-      margin-bottom: 30px;
-    }
-    footer {
-      margin-top: 60px;
-      font-size: 0.8rem;
-      color: #888;
-    }
-    #chat {
+
+    #chatContainer {
+      margin-top: 20px;
       width: 100%;
       max-width: 500px;
-      margin: 40px auto;
-      background: #222;
-      padding: 10px;
-      border-radius: 8px;
-      text-align: left;
     }
+
     #messages {
+      background-color: #222;
       height: 300px;
       overflow-y: auto;
-      background: #000;
       padding: 10px;
+      border: 1px solid #444;
       border-radius: 6px;
-      margin-bottom: 10px;
-      font-size: 0.9rem;
     }
-    #chat input, #chat button {
-      padding: 8px;
-      font-size: 1rem;
-    }
-    #chat input {
-      width: 70%;
+
+    #nicknameInput, #messageInput {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 5px;
       border: none;
-      border-radius: 4px;
+      font-size: 16px;
     }
-    #chat button {
-      width: 25%;
-      margin-left: 5%;
-      background: #444;
-      color: #fff;
+
+    #sendButton {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      background-color: #5f9;
+      color: #000;
       border: none;
-      border-radius: 4px;
-    }
-    .message {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 5px;
-    }
-    .message span.delete-btn {
+      border-radius: 5px;
       cursor: pointer;
-      color: red;
-      margin-left: 10px;
     }
-    .timestamp {
-      color: #777;
-      font-size: 0.7rem;
-      margin-left: 6px;
+
+    #nicknameInput::placeholder {
+      color: #aaa;
     }
   </style>
 </head>
 <body>
-  <h1>🎧 UzakMedia</h1>
-  <p>Her Cumartesi 22:00–01:00 arasında <strong>Fısıltı</strong> yayında.</p>
 
-  <!-- Player -->
-  <div id="rtJpID-1"></div>
-  <div class="rtplwrapperForIe">
-    <div id="rtplayer-1" class="rtplmain_window gradient_style-4">
-      <a id="button_play_stop-1" class="rtplbutton_play_stop button_play_stop_style-4" href="#"></a>
-      <div id="current_time-1" class="rtplcurrent_time">00:00:00</div>
-      <a id="rtplmute-1" class="rtplmute button_mute_style-4" href="#"></a>
-      <div id="rtplvolume-1" class="rtplvolume"></div>
-      <a id="rtplmaxvol-1" class="rtplmaxvol button_max_vol_style-4" href="#"></a>
-    </div>
-  </div>
+  <h2>🎙️ Uzak Media - Canlı Yayın</h2>
 
-  <!-- Chat Bölümü -->
-  <div id="chat">
+  <!-- Radyo Player (Autoplay için muted + script eklenecek) -->
+  <audio id="radioPlayer" autoplay muted>
+    <source src="https://radio.streemlion.com:4670/stream" type="audio/mpeg">
+    Tarayıcınız ses oynatmayı desteklemiyor.
+  </audio>
+
+  <!-- Chat -->
+  <div id="chatContainer">
     <div id="messages"></div>
-    <input type="text" id="msg" placeholder="Mesaj yaz..." />
-    <button onclick="sendMessage()">Gönder</button>
+    <input type="text" id="nicknameInput" placeholder="Takma adını buraya yaz..." />
+    <input type="text" id="messageInput" placeholder="Mesajını yaz..." disabled />
+    <button id="sendButton" onclick="sendMessage()" disabled>Gönder</button>
   </div>
 
-  <!-- Firebase with your config -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  <script>
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyA4w0aZLXXJNznxYx4XVe3in-U4wRdkNsc",
       authDomain: "uzakmedia-chat.firebaseapp.com",
-      databaseURL: "https://uzakmedia-chat-default-rtdb.firebaseio.com",
       projectId: "uzakmedia-chat",
-      storageBucket: "uzakmedia-chat.firebasestorage.app",
+      storageBucket: "uzakmedia-chat.appspot.com",
       messagingSenderId: "268248700773",
-      appId: "1:268248700773:web:b81a190e0688e027e5738c"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    const modUsers = ["bektaş", "mod1", "mod2", "mod3"];
-
-    let nickname = localStorage.getItem("nickname");
-    if (!nickname) {
-      nickname = prompt("Takma adını yaz:") || "Anon" + Math.floor(Math.random()*1000);
-      localStorage.setItem("nickname", nickname);
-    }
-
-    const emojiMap = {
-      ":)": "😊",
-      ":(": "😞",
-      ":D": "😄",
-      ":P": "😜",
-      "<3": "❤️"
+      appId: "1:268248700773:web:b81a190e0688e027e5738c",
+      databaseURL: "https://uzakmedia-chat-default-rtdb.europe-west1.firebasedatabase.app"
     };
 
-    function formatEmojis(text) {
-      for (let key in emojiMap) {
-        text = text.split(key).join(emojiMap[key]);
-      }
-      return text;
-    }
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const messagesRef = ref(db, "messages");
 
-    const messagesRef = db.ref("messages");
-    messagesRef.limitToLast(100).on("child_added", snap => {
-      const msg = snap.val();
-      const div = document.createElement("div");
-      div.className = "message";
-      div.setAttribute("data-key", snap.key);
+    let nickname = "";
 
-      const contentSpan = document.createElement("span");
-      const formattedText = formatEmojis(msg.text);
-      const timestamp = new Date(msg.timestamp || Date.now()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-      contentSpan.textContent = `${msg.name}: ${formattedText}`;
-
-      const timeSpan = document.createElement("span");
-      timeSpan.className = "timestamp";
-      timeSpan.textContent = timestamp;
-
-      div.appendChild(contentSpan);
-      div.appendChild(timeSpan);
-
-      if (modUsers.includes(nickname.toLowerCase())) {
-        const del = document.createElement("span");
-        del.innerText = "🗑️";
-        del.className = "delete-btn";
-        del.onclick = () => messagesRef.child(snap.key).remove();
-        div.appendChild(del);
-      }
-
-      document.getElementById("messages").appendChild(div);
-      const msgBox = document.getElementById("messages");
-      msgBox.scrollTop = msgBox.scrollHeight;
+    // Nickname yazıldığında mesaj kutusu aktif hale gelir
+    document.getElementById("nicknameInput").addEventListener("input", () => {
+      nickname = document.getElementById("nicknameInput").value.trim();
+      const enable = nickname.length > 1;
+      document.getElementById("messageInput").disabled = !enable;
+      document.getElementById("sendButton").disabled = !enable;
     });
 
-    messagesRef.on("child_removed", snap => {
-      const msgElem = document.querySelector(`[data-key='${snap.key}']`);
-      if (msgElem) msgElem.remove();
+    // Mesaj gönder
+    window.sendMessage = function () {
+      const msg = document.getElementById("messageInput").value.trim();
+      if (msg.length > 0 && nickname.length > 1) {
+        push(messagesRef, {
+          sender: nickname,
+          text: msg,
+          timestamp: Date.now()
+        });
+        document.getElementById("messageInput").value = "";
+      }
+    };
+
+    // Yeni mesajları dinle
+    onChildAdded(messagesRef, (data) => {
+      const msg = data.val();
+      const p = document.createElement("p");
+      p.textContent = `${msg.sender}: ${msg.text}`;
+      document.getElementById("messages").appendChild(p);
+      document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
     });
 
-    let lastSent = 0;
-
-    function sendMessage() {
-      const now = Date.now();
-      if (now - lastSent < 3000) {
-        alert("Lütfen mesajlar arasında en az 3 saniye bekleyin.");
-        return;
-      }
-
-      const text = document.getElementById("msg").value;
-      if (text.trim() !== "") {
-        messagesRef.push({ name: nickname, text, timestamp: now });
-        document.getElementById("msg").value = "";
-        lastSent = now;
-      }
-    }
+    // Autoplay fix: kullanıcı sayfaya tıklayınca sesi başlat
+    window.addEventListener("click", () => {
+      const player = document.getElementById("radioPlayer");
+      player.muted = false;
+      player.play().catch(() => {});
+    }, { once: true });
   </script>
 
-  <!-- Player JS -->
-  <script>
-    if (typeof jQuery == 'undefined') {
-      var i = "i";
-      document.write('<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js"></scr' + i + 'pt>');
-    }
-  </script>
-  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/jquery.jplayer.min.js"></script>
-  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/jquery-ui-1.10.2.custom.min.js"></script>
-  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/modernizr.js"></script>
-  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/rt_pl.js"></script>
-  <script>
-    $(document).ready(function () {
-      new RTPlayer(
-        1,
-        80,
-        true,
-        "https://radio.streemlion.com:4670",
-        "mp3",
-        { mp3: "https://radio.streemlion.com:4685/stream" },
-        "en"
-      );
-    });
-  </script>
-
-  <footer>© 2025 UzakMedia - uzakmedia.xyz</footer>
 </body>
 </html>
