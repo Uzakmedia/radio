@@ -2,72 +2,96 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Uzak Media</title>
-
-  <!-- Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
-
-  <!-- Player CSS -->
-  <link href="https://radio.streemlion.com:4670/media/static/css/player/base.css" rel="stylesheet" />
-  <link href="https://radio.streemlion.com:4670/media/static/css/player/style-4-mini.css" rel="stylesheet" />
-  <link href="https://radio.streemlion.com:4670/media/static/css/ui/jquery.ui.slider.css" rel="stylesheet" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       margin: 0;
-      background-color: #111;
+      background-color: #000814;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      height: 100vh;
+      padding: 40px 20px;
     }
 
-    #radio-image {
-      width: 320px;
-      cursor: pointer;
-      transition: transform 0.3s ease;
+    h1 {
+      font-size: 2.2rem;
+      letter-spacing: 3px;
+      margin-bottom: 30px;
+      color: #ffea00;
+      text-shadow: 0 0 10px #ffea00aa;
     }
 
-    #radio-image:hover {
-      transform: scale(1.03);
-    }
-
-    #rtplayer-1 {
-      display: none; /* Player gizli */
+    #sc-player {
+      max-width: 100%;
     }
   </style>
 </head>
 <body>
 
-  <!-- Retro Radyo Görseli -->
-  <img id="radio-image" src="vintage-radio.png" alt="Uzak Media Radyosu" />
+  <h1>UZAK MEDIA</h1>
 
-  <!-- Gizli Player -->
-  <div id="rtplayer-1" class="rtplmain_window-mini gradient_style-4-mini">
-    <a id="button_play_stop-1" class="rtplbutton_play_stop-mini button_play_stop_style-4-mini" href="#"></a>
-    <div id="current_time-1" class="rtplcurrent_time-mini">00:00:00</div>
-    <a id="rtplmute-1" class="rtplmute-mini button_mute_style-4-mini" href="#"></a>
-    <div id="rtplvolume-1" class="rtplvolume-mini"></div>
-    <a id="rtplmaxvol-1" class="rtplmaxvol-mini button_max_vol_style-4-mini" href="#"></a>
+  <div style="width: 480px;" id="sc-player">
+    <div
+      is="player"
+      lang="en"
+      api-url="https://radio.streemlion.com:4670/api/v2"
+      server-id="1"
+      station-name="Uzak Media"
+      station-url=""
+      imagecontainer="top"
+      imagecontainer-bg="#ffea00"
+      imagecontainer-bg-opacity="1"
+      controlscontainer="bottom"
+      controlscontainer-bg="#0011ff"
+      controlscontainer-bg-opacity="1"
+      controlscontainer-bg-img="https://radio.streemlion.com:4670/media/player_bg/player_bg.jpg"
+      historycontainer="both"
+      historycontainer-bg="#cdd8e5"
+      historycontainer-bg-opacity="1"
+      :show-history="false"
+      history-limit="10"
+      sharecontainer="both"
+      sharecontainer-bg="#ffffff"
+      sharecontainer-bg-opacity="1"
+      :show-share="false"
+      share-url=""
+      :share="['facebook','telegram','twitter']"
+      :show-dj="false"
+      default-dj-img="https://radio.streemlion.com:4670/media/djs/dj.png"
+      :show-image="false"
+      default-cover-image="https://radio.streemlion.com:4670/media/tracks/default_track_img.png"
+      play-button-color="#007bff"
+      play-button-bg="null"
+      visualizer-outline-color="#37679a"
+      visualizer-bar-width="1"
+      :channels-displayed="[1]"
+      channels-switch-bg="#4165b9"
+      channels-switch-color="#ffffff"
+      channels-switch-bg-active="#dddddd"
+      channels-switch-color-active="#000000"
+      :show-vote="false"
+      vote-buttons-color="#35495e"
+      vote-buttons-opacity="1"
+      vote-results-font-color="#FFFFFF"
+      vote-results-font-size="16"
+      :progress-show="false"
+      progress-bar-color="#35495e"
+      progress-bar-bg-color="#41b883"
+      progress-bar-bg-opacity="0.1"
+      progress-bar-bg-height="25"
+      progress-bar-opacity="1"
+      progress-font-color="#FFFFFF"
+      progress-font-size="12"
+      progress-bar-bg-radius="10"
+      progress-bar-bg-border="#F5F5F5"
+      player-width="480px"
+    ></div>
   </div>
 
-  <!-- Scripts -->
-  <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-  <script>
-    let isPlaying = false;
-
-    $(document).ready(function () {
-      new RTPlayer(1, 90, true, "https://radio.streemlion.com:4670", "mp3", {
-        "mp3": "https://radio.streemlion.com:4685/stream"
-      }, "tr");
-
-      $("#radio-image").click(function () {
-        $("#button_play_stop-1").click(); // Play/Pause tıklaması
-        isPlaying = !isPlaying;
-      });
-    });
-  </script>
+  <script type="text/javascript" src="https://radio.streemlion.com:4670/media/static/js/sc_player/sc_player.js"></script>
 
 </body>
 </html>
