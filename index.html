@@ -3,41 +3,54 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Uzak Media</title>
+  <title>Uzak Media Radyo</title>
 
-  <!-- Streemlion CSS -->
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+
+  <!-- Player CSS -->
   <link href="https://radio.streemlion.com:4670/media/static/css/player/base.css" rel="stylesheet" />
   <link href="https://radio.streemlion.com:4670/media/static/css/player/style-4-mini.css" rel="stylesheet" />
   <link href="https://radio.streemlion.com:4670/media/static/css/ui/jquery.ui.slider.css" rel="stylesheet" />
-  
-  <!-- Sayfa Stili -->
+
   <style>
     body {
-      background-color: #111;
-      color: #fff;
-      font-family: sans-serif;
       margin: 0;
-      padding: 40px 20px;
+      padding: 0;
+      background: linear-gradient(145deg, #0f0f0f, #1a1a1a);
+      font-family: 'Orbitron', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: white;
+    }
+
+    .player-wrapper {
+      background-color: #121212;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+      padding: 30px;
       text-align: center;
+      width: 320px;
     }
 
-    h1 {
-      margin-bottom: 40px;
-      font-size: 36px;
+    .player-wrapper h1 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      letter-spacing: 2px;
+      color: #e0e0e0;
     }
 
-    #rtplayer-1 {
-      display: inline-block;
+    .rtplmain_window-mini {
+      margin: 0 auto;
     }
   </style>
 </head>
 <body>
 
-  <h1>Uzak Media</h1>
-
-  <!-- Streemlion Mini Player -->
-  <div id="rtJpID-1"></div>
-  <div class="rtplwrapperForIe-mini">
+  <div class="player-wrapper">
+    <h1>Uzak Media Radyo</h1>
     <div id="rtplayer-1" class="rtplmain_window-mini gradient_style-4-mini">
       <a id="button_play_stop-1" class="rtplbutton_play_stop-mini button_play_stop_style-4-mini" href="#"></a>
       <div id="current_time-1" class="rtplcurrent_time-mini">00:00:00</div>
@@ -47,18 +60,10 @@
     </div>
   </div>
 
-  <!-- jQuery -->
+  <!-- JQuery ve Player Script -->
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-
-  <!-- Streemlion Scripts -->
-  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/jquery.jplayer.min.js"></script>
-  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/jquery-ui-1.10.2.custom.min.js"></script>
-  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/modernizr.js"></script>
-  <script src="https://radio.streemlion.com:4670/media/static/js/jplayer/rt_pl.js"></script>
-
-  <!-- Player Başlat -->
   <script>
-    $(document).ready(function(){
+    $(document).ready(function() {
       new RTPlayer(1, 90, true, "https://radio.streemlion.com:4670", "mp3", {
         "mp3": "https://radio.streemlion.com:4685/stream"
       }, "en");
