@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Uzak Media</title>
 
-  <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
-
-  <!-- Player CSS -->
   <link href="https://radio.streemlion.com:4670/media/static/css/player/base.css" rel="stylesheet" />
   <link href="https://radio.streemlion.com:4670/media/static/css/player/style-4-mini.css" rel="stylesheet" />
   <link href="https://radio.streemlion.com:4670/media/static/css/ui/jquery.ui.slider.css" rel="stylesheet" />
@@ -17,24 +14,41 @@
     body {
       margin: 0;
       padding: 0;
-      background: linear-gradient(to bottom, #0e0e0e, #1c1c1c);
+      background: #1b1b1b;
       font-family: 'Orbitron', sans-serif;
-      color: white;
-    }
-
-    header {
-      text-align: center;
-      padding: 40px 0 20px;
-      font-size: 1.8rem;
-      font-weight: bold;
-      letter-spacing: 2px;
-      color: #eaeaea;
-    }
-
-    .player-wrapper {
       display: flex;
       justify-content: center;
       align-items: flex-start;
+      padding-top: 60px;
+      color: white;
+    }
+
+    .radio-box {
+      width: 340px;
+      height: 220px;
+      background: url('https://i.imgur.com/LlBLnKu.png'); /* örnek radyo görünümü */
+      background-size: cover;
+      background-position: center;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      position: relative;
+      padding-top: 80px;
+    }
+
+    .radio-label {
+      position: absolute;
+      top: 20px;
+      width: 100%;
+      text-align: center;
+      font-size: 1.4rem;
+      color: #ffe58a;
+      text-shadow: 1px 1px 2px #000;
+    }
+
+    .radio-player {
+      position: relative;
+      display: flex;
+      justify-content: center;
     }
 
     .rtplmain_window-mini {
@@ -44,33 +58,25 @@
 </head>
 <body>
 
-  <header>Uzak Media</header>
-
-  <div class="player-wrapper">
-    <div id="rtplayer-1" class="rtplmain_window-mini gradient_style-4-mini">
-      <a id="button_play_stop-1" class="rtplbutton_play_stop-mini button_play_stop_style-4-mini" href="#"></a>
-      <div id="current_time-1" class="rtplcurrent_time-mini">00:00:00</div>
-      <a id="rtplmute-1" class="rtplmute-mini button_mute_style-4-mini" href="#"></a>
-      <div id="rtplvolume-1" class="rtplvolume-mini"></div>
-      <a id="rtplmaxvol-1" class="rtplmaxvol-mini button_max_vol_style-4-mini" href="#"></a>
+  <div class="radio-box">
+    <div class="radio-label">Uzak Media</div>
+    <div class="radio-player">
+      <div id="rtplayer-1" class="rtplmain_window-mini gradient_style-4-mini">
+        <a id="button_play_stop-1" class="rtplbutton_play_stop-mini button_play_stop_style-4-mini" href="#"></a>
+        <div id="current_time-1" class="rtplcurrent_time-mini">00:00:00</div>
+        <a id="rtplmute-1" class="rtplmute-mini button_mute_style-4-mini" href="#"></a>
+        <div id="rtplvolume-1" class="rtplvolume-mini"></div>
+        <a id="rtplmaxvol-1" class="rtplmaxvol-mini button_max_vol_style-4-mini" href="#"></a>
+      </div>
     </div>
   </div>
 
-  <!-- jQuery & Player Script -->
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
   <script>
     $(document).ready(function() {
-      new RTPlayer(
-        1,
-        90,
-        true,
-        "https://radio.streemlion.com:4670", // Shoutcast host
-        "mp3",
-        {
-          "mp3": "https://radio.streemlion.com:4685/stream" // Your stream URL
-        },
-        "tr"
-      );
+      new RTPlayer(1, 90, true, "https://radio.streemlion.com:4670", "mp3", {
+        "mp3": "https://radio.streemlion.com:4685/stream"
+      }, "tr");
     });
   </script>
 
