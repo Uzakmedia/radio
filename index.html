@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Uzak Media</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
       margin: 0;
@@ -26,6 +27,92 @@
 
     #sc-player {
       max-width: 100%;
+      margin-bottom: 40px;
+    }
+
+    /* Chat alanı */
+    .container {
+      display: flex;
+      width: 100%;
+      max-width: 900px;
+      gap: 20px;
+    }
+
+    #chat-area {
+      flex: 3;
+    }
+
+    #chat-box {
+      background: #1b1b1b;
+      border-radius: 8px;
+      padding: 15px;
+      height: 400px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+    }
+
+    .message {
+      margin-bottom: 10px;
+      padding: 8px;
+      border-radius: 5px;
+      word-wrap: break-word;
+    }
+
+    .moderator {
+      background-color: #222f66;
+      color: #ffea00;
+    }
+
+    .user {
+      background-color: #292929;
+    }
+
+    #chat-form {
+      display: flex;
+      gap: 10px;
+    }
+
+    #message-input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      outline: none;
+    }
+
+    #send-button {
+      padding: 10px 15px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    #nickname {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+
+    #online-users {
+      flex: 1;
+      background: #161616;
+      border-radius: 8px;
+      padding: 10px;
+      height: 460px;
+      overflow-y: auto;
+    }
+
+    #online-users h3 {
+      font-size: 1rem;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #444;
+      padding-bottom: 5px;
+    }
+
+    .user-item {
+      font-size: 0.9rem;
+      margin-bottom: 6px;
     }
   </style>
 </head>
@@ -33,6 +120,7 @@
 
   <h1>UZAK MEDIA</h1>
 
+  <!-- Radyo Player -->
   <div style="width: 480px;" id="sc-player">
     <div
       is="player"
@@ -91,7 +179,107 @@
     ></div>
   </div>
 
-  <script type="text/javascript" src="https://radio.streemlion.com:4670/media/static/js/sc_player/sc_player.js"></script>
+  <!-- Chat Alanı -->
+  <div class="container">
+    <div id="chat-area">
+      <div id="nickname"></div>
+      <div id="chat-box"></div>
+
+      <form id="chat-form">
+        <input type="text" id="message-input" placeholder="Mesajınızı yazın..." maxlength="200" required />
+        <button type="submit" id="send-button">Gönder</button>
+      </form>
+    </div>
+
+    <div id="online-users">
+      <h3>🔸 Çevrimiçi</h3>
+      <div id="user-list"></div>
+    </div>
+  </div>
+
+  <!-- Player JS -->
+  <script src="https://radio.streemlion.com:4670/media/static/js/sc_player/sc_player.js"></script>
+
+  <!-- Firebase Chat JS -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded, set, onValue, remove } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBBBsr9Zjveq6MYdMuwVgAVGgEP_6AmPU0",
+      authDomain: "uzak-media-chat.firebaseapp.com",
+      databaseURL: "https://uzak-media-chat-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "uzak-media-chat",
+      storageBucket: "uzak-media-chat.firebasestorage.app",
+      messagingSenderId: "353010124754",
+      appId: "1:353010124754:web:11af752d0bffac765f2a0b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const messagesRef = ref(db, "messages");
+    const onlineRef = ref(db, "onlineUsers");
+
+    const nickPool = ["misafir_91", "gecegezgini", "sessizdinleyici", "hayalet07", "vagabond", "karafre", "tozbulutu"];
+    const moderatorList = ["admin", "serhat06", "faruk52", "sinan07"];
+    const nickname = nickPool[Math.floor(Math.random() * nickPool.length)];
+    const userKey = nickname + "_" + Math.floor(Math.random() * 10000);
+
+    document.getElementById("nickname").innerText = `🧑 Takma adınız: ${nickname}`;
+
+    function setOnline() {
+      set(ref(db, `onlineUsers/${userKey}`), {
+        nick: nickname,
+        timestamp: Date.now()
+      });
+    }
+
+    setOnline();
+    setInterval(setOnline, 20000);
+
+    window.addEventListener("beforeunload", () => {
+      remove(ref(db, `onlineUsers/${userKey}`));
+    });
+
+    document.getElementById("chat-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const text = document.getElementById("message-input").value.trim();
+      if (text.length > 0) {
+        push(messagesRef, {
+          user: nickname,
+          text: text,
+          time: new Date().toLocaleTimeString("tr-TR")
+        });
+        document.getElementById("message-input").value = "";
+      }
+    });
+
+    onChildAdded(messagesRef, function(snapshot) {
+      const msg = snapshot.val();
+      const msgDiv = document.createElement("div");
+      const isMod = moderatorList.includes(msg.user);
+      msgDiv.classList.add("message", isMod ? "moderator" : "user");
+      msgDiv.innerHTML = `<strong>${msg.user}</strong> <small style="float:right">${msg.time}</small><br>${msg.text}`;
+      document.getElementById("chat-box").appendChild(msgDiv);
+      document.getElementById("chat-box").scrollTop = document.getElementById("chat-box").scrollHeight;
+    });
+
+    onValue(onlineRef, function(snapshot) {
+      const userList = document.getElementById("user-list");
+      userList.innerHTML = "";
+      const now = Date.now();
+
+      snapshot.forEach(child => {
+        const data = child.val();
+        if (now - data.timestamp < 30000) {
+          const div = document.createElement("div");
+          div.classList.add("user-item");
+          div.innerText = data.nick;
+          userList.appendChild(div);
+        }
+      });
+    });
+  </script>
 
 </body>
 </html>
