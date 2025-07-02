@@ -59,6 +59,17 @@ window.addEventListener("beforeunload", () => {
 
 document.getElementById("chat-form").addEventListener("submit", function(e) {
   e.preventDefault();
+  sendMessage();
+});
+
+document.getElementById("message-input").addEventListener("keypress", function(e) {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+function sendMessage() {
   const text = document.getElementById("message-input").value.trim();
   if (text.length > 0) {
     const userIP = localStorage.getItem("userIP") || "unknown";
@@ -70,7 +81,7 @@ document.getElementById("chat-form").addEventListener("submit", function(e) {
     });
     document.getElementById("message-input").value = "";
   }
-});
+}
 
 document.getElementById("change-nick-button").addEventListener("click", function() {
   const newNick = prompt("Yeni nickinizi girin:");
@@ -82,7 +93,7 @@ document.getElementById("change-nick-button").addEventListener("click", function
 
 document.getElementById("admin-login-button").addEventListener("click", function() {
   const password = prompt("Admin şifresini girin:");
-  if (password === "uzak123") {
+  if (password === "uzak123!6852") {
     localStorage.setItem("isAdmin", "true");
     isAdmin = true;
     alert("Admin girişi başarılı");
@@ -143,13 +154,19 @@ onValue(onlineRef, function(snapshot) {
   userList.innerHTML = "";
   const now = Date.now();
 
+  const users = [];
+
   snapshot.forEach(child => {
     const data = child.val();
     if (now - data.timestamp < 30000) {
-      const div = document.createElement("div");
-      div.classList.add("user-item");
-      div.innerText = data.nick;
-      userList.appendChild(div);
+      users.push(data.nick);
     }
+  });
+
+  users.forEach(nick => {
+    const div = document.createElement("div");
+    div.classList.add("user-item");
+    div.innerText = nick;
+    userList.appendChild(div);
   });
 });
