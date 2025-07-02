@@ -24,6 +24,57 @@
       text-shadow: 0 0 8px #ffea00aa;
     }
 
+    /* === YAYIN AKIŞI === */
+    .schedule {
+      background-color: #1c1c1c;
+      border: 1px solid #ffea00;
+      padding: 15px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 360px;
+      margin-bottom: 30px;
+      box-shadow: 0 0 10px #ffea0044;
+    }
+
+    .schedule h2 {
+      color: #ffea00;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .schedule ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .schedule li {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #444;
+      color: #fff;
+      font-size: 0.95rem;
+    }
+
+    .schedule .day {
+      color: #ffea00;
+      font-weight: bold;
+    }
+
+    .schedule .time {
+      color: #ffd700;
+      margin-left: 5px;
+    }
+
+    .schedule .desc {
+      font-style: italic;
+      color: #ccc;
+      margin-top: 5px;
+    }
+
     #sc-player {
       width: 100%;
       max-width: 360px;
@@ -140,6 +191,18 @@
 </head>
 <body>
   <h1>UZAK MEDIA</h1>
+
+  <!-- Yayın Akışı -->
+  <div class="schedule">
+    <h2>📻 Yayın Akışı</h2>
+    <ul>
+      <li>
+        <span class="day">6 Temmuz 2025 Pazar</span>
+        <span class="time">21:00</span> –
+        <span class="desc">Canlı Yayın</span>
+      </li>
+    </ul>
+  </div>
 
   <div id="sc-player">
     <div
