@@ -187,6 +187,37 @@
       font-size: 0.85rem;
       margin-bottom: 4px;
     }
+
+    /* === GALAKSİ ARKA PLAN === */
+    body::before, body::after {
+      content: "";
+      position: fixed;
+      top: 0;
+      width: 100px;
+      height: 100%;
+      background-repeat: no-repeat;
+      background-size: cover;
+      z-index: -1;
+      opacity: 0.1;
+      pointer-events: none;
+    }
+
+    body::before {
+      left: 0;
+      background-image: url('https://i.imgur.com/IUD8Q7v.png');
+    }
+
+    body::after {
+      right: 0;
+      background-image: url('https://i.imgur.com/FNMXxRc.png');
+    }
+
+    @media (max-width: 768px) {
+      body::before, body::after {
+        width: 50px;
+        opacity: 0.07;
+      }
+    }
   </style>
 </head>
 <body>
