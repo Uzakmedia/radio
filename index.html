@@ -2,35 +2,21 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Uzak Media</title>
+  <title>Uzak Media Chat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <style>
     body {
-      margin: 0;
-      background-color: #000814;
+      background: #0e0e0e;
       color: white;
       font-family: 'Segoe UI', sans-serif;
+      margin: 0;
       display: flex;
+      justify-content: center;
+      padding: 20px;
       flex-direction: column;
       align-items: center;
-      padding: 40px 20px;
     }
 
-    h1 {
-      font-size: 2.2rem;
-      letter-spacing: 3px;
-      margin-bottom: 30px;
-      color: #ffea00;
-      text-shadow: 0 0 10px #ffea00aa;
-    }
-
-    #sc-player {
-      max-width: 100%;
-      margin-bottom: 40px;
-    }
-
-    /* Chat alanı */
     .container {
       display: flex;
       width: 100%;
@@ -56,6 +42,7 @@
       padding: 8px;
       border-radius: 5px;
       word-wrap: break-word;
+      position: relative;
     }
 
     .moderator {
@@ -65,6 +52,24 @@
 
     .user {
       background-color: #292929;
+    }
+
+    .admin {
+      background-color: #661111;
+      color: #ffffff;
+    }
+
+    .delete-button {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      padding: 2px 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
     }
 
     #chat-form {
@@ -80,12 +85,13 @@
       outline: none;
     }
 
-    #send-button {
+    #send-button, #change-nick-button {
       padding: 10px 15px;
       background: #007bff;
       color: white;
       border: none;
       border-radius: 5px;
+      cursor: pointer;
     }
 
     #nickname {
@@ -118,168 +124,148 @@
 </head>
 <body>
 
-  <h1>UZAK MEDIA</h1>
+<h1>UZAK MEDIA CHAT</h1>
 
-  <!-- Radyo Player -->
-  <div style="width: 480px;" id="sc-player">
-    <div
-      is="player"
-      lang="en"
-      api-url="https://radio.streemlion.com:4670/api/v2"
-      server-id="1"
-      station-name="Uzak Media"
-      station-url=""
-      imagecontainer="top"
-      imagecontainer-bg="#ffea00"
-      imagecontainer-bg-opacity="1"
-      controlscontainer="bottom"
-      controlscontainer-bg="#0011ff"
-      controlscontainer-bg-opacity="1"
-      controlscontainer-bg-img="https://radio.streemlion.com:4670/media/player_bg/player_bg.jpg"
-      historycontainer="both"
-      historycontainer-bg="#cdd8e5"
-      historycontainer-bg-opacity="1"
-      :show-history="false"
-      history-limit="10"
-      sharecontainer="both"
-      sharecontainer-bg="#ffffff"
-      sharecontainer-bg-opacity="1"
-      :show-share="false"
-      share-url=""
-      :share="['facebook','telegram','twitter']"
-      :show-dj="false"
-      default-dj-img="https://radio.streemlion.com:4670/media/djs/dj.png"
-      :show-image="false"
-      default-cover-image="https://radio.streemlion.com:4670/media/tracks/default_track_img.png"
-      play-button-color="#007bff"
-      play-button-bg="null"
-      visualizer-outline-color="#37679a"
-      visualizer-bar-width="1"
-      :channels-displayed="[1]"
-      channels-switch-bg="#4165b9"
-      channels-switch-color="#ffffff"
-      channels-switch-bg-active="#dddddd"
-      channels-switch-color-active="#000000"
-      :show-vote="false"
-      vote-buttons-color="#35495e"
-      vote-buttons-opacity="1"
-      vote-results-font-color="#FFFFFF"
-      vote-results-font-size="16"
-      :progress-show="false"
-      progress-bar-color="#35495e"
-      progress-bar-bg-color="#41b883"
-      progress-bar-bg-opacity="0.1"
-      progress-bar-bg-height="25"
-      progress-bar-opacity="1"
-      progress-font-color="#FFFFFF"
-      progress-font-size="12"
-      progress-bar-bg-radius="10"
-      progress-bar-bg-border="#F5F5F5"
-      player-width="480px"
-    ></div>
+<div class="container">
+  <div id="chat-area">
+    <div id="nickname"></div>
+    <div id="chat-box"></div>
+
+    <form id="chat-form">
+      <input type="text" id="message-input" placeholder="Mesaj yaz..." maxlength="200" required />
+      <button type="submit" id="send-button">Gönder</button>
+      <button type="button" id="change-nick-button">Nickimi Değiştir</button>
+    </form>
   </div>
 
-  <!-- Chat Alanı -->
-  <div class="container">
-    <div id="chat-area">
-      <div id="nickname"></div>
-      <div id="chat-box"></div>
-
-      <form id="chat-form">
-        <input type="text" id="message-input" placeholder="Mesajınızı yazın..." maxlength="200" required />
-        <button type="submit" id="send-button">Gönder</button>
-      </form>
-    </div>
-
-    <div id="online-users">
-      <h3>🔸 Çevrimiçi</h3>
-      <div id="user-list"></div>
-    </div>
+  <div id="online-users">
+    <h3>🔸 Çevrimiçi</h3>
+    <div id="user-list"></div>
   </div>
+</div>
 
-  <!-- Player JS -->
-  <script src="https://radio.streemlion.com:4670/media/static/js/sc_player/sc_player.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+  import { getDatabase, ref, push, onChildAdded, set, onValue, remove, get, child } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
-  <!-- Firebase Chat JS -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded, set, onValue, remove } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyBBBsr9Zjveq6MYdMuwVgAVGgEP_6AmPU0",
+    authDomain: "uzak-media-chat.firebaseapp.com",
+    databaseURL: "https://uzak-media-chat-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "uzak-media-chat",
+    storageBucket: "uzak-media-chat.firebasestorage.app",
+    messagingSenderId: "353010124754",
+    appId: "1:353010124754:web:11af752d0bffac765f2a0b"
+  };
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBBBsr9Zjveq6MYdMuwVgAVGgEP_6AmPU0",
-      authDomain: "uzak-media-chat.firebaseapp.com",
-      databaseURL: "https://uzak-media-chat-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "uzak-media-chat",
-      storageBucket: "uzak-media-chat.firebasestorage.app",
-      messagingSenderId: "353010124754",
-      appId: "1:353010124754:web:11af752d0bffac765f2a0b"
-    };
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const messagesRef = ref(db, "messages");
+  const onlineRef = ref(db, "onlineUsers");
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const messagesRef = ref(db, "messages");
-    const onlineRef = ref(db, "onlineUsers");
+  const moderatorList = ["admin", "serhat06", "faruk52", "sinan07"];
 
-    const nickPool = ["misafir_91", "gecegezgini", "sessizdinleyici", "hayalet07", "vagabond", "karafre", "tozbulutu"];
-    const moderatorList = ["admin", "serhat06", "faruk52", "sinan07"];
-    const nickname = nickPool[Math.floor(Math.random() * nickPool.length)];
-    const userKey = nickname + "_" + Math.floor(Math.random() * 10000);
+  function generateNick() {
+    const fruits = ["elma", "portakal", "mandalina", "avokado", "erik", "mango"];
+    const name = fruits[Math.floor(Math.random() * fruits.length)] + "_" + Math.floor(Math.random() * 10000);
+    return name;
+  }
 
-    document.getElementById("nickname").innerText = `🧑 Takma adınız: ${nickname}`;
-
-    function setOnline() {
-      set(ref(db, `onlineUsers/${userKey}`), {
-        nick: nickname,
-        timestamp: Date.now()
+  async function getUniqueNick() {
+    let newNick;
+    let exists = true;
+    while (exists) {
+      newNick = generateNick();
+      const snapshot = await get(ref(db, `onlineUsers`));
+      exists = false;
+      snapshot.forEach(child => {
+        if (child.val().nick === newNick) exists = true;
       });
     }
+    return newNick;
+  }
 
-    setOnline();
-    setInterval(setOnline, 20000);
+  async function assignNick(force = false) {
+    if (!localStorage.getItem("uzakmedia_nick") || force) {
+      const nick = await getUniqueNick();
+      localStorage.setItem("uzakmedia_nick", nick);
+      location.reload();
+    }
+  }
 
-    window.addEventListener("beforeunload", () => {
-      remove(ref(db, `onlineUsers/${userKey}`));
+  document.getElementById("change-nick-button").addEventListener("click", () => assignNick(true));
+
+  let nickname = localStorage.getItem("uzakmedia_nick");
+  if (!nickname) assignNick();
+
+  const userKey = nickname + "_" + Math.floor(Math.random() * 10000);
+  document.getElementById("nickname").innerText = `🧑 Takma adınız: ${nickname}`;
+
+  function setOnline() {
+    set(ref(db, `onlineUsers/${userKey}`), {
+      nick: nickname,
+      timestamp: Date.now()
     });
+  }
 
-    document.getElementById("chat-form").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const text = document.getElementById("message-input").value.trim();
-      if (text.length > 0) {
-        push(messagesRef, {
-          user: nickname,
-          text: text,
-          time: new Date().toLocaleTimeString("tr-TR")
-        });
-        document.getElementById("message-input").value = "";
+  setOnline();
+  setInterval(setOnline, 20000);
+
+  window.addEventListener("beforeunload", () => {
+    remove(ref(db, `onlineUsers/${userKey}`));
+  });
+
+  document.getElementById("chat-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const text = document.getElementById("message-input").value.trim();
+    if (text.length > 0) {
+      push(messagesRef, {
+        user: nickname,
+        text: text,
+        time: new Date().toLocaleTimeString("tr-TR")
+      });
+      document.getElementById("message-input").value = "";
+    }
+  });
+
+  onChildAdded(messagesRef, function(snapshot) {
+    const msg = snapshot.val();
+    const msgKey = snapshot.key;
+    const msgDiv = document.createElement("div");
+    const isMod = moderatorList.includes(nickname);
+    const isAdmin = nickname === "admin";
+
+    msgDiv.classList.add("message");
+    msgDiv.classList.add(msg.user === "admin" ? "admin" : moderatorList.includes(msg.user) ? "moderator" : "user");
+    msgDiv.innerHTML = `<strong>${msg.user}</strong> <small style="float:right">${msg.time}</small><br>${msg.text}`;
+
+    if (isMod || isAdmin) {
+      const delBtn = document.createElement("button");
+      delBtn.innerText = "Sil";
+      delBtn.className = "delete-button";
+      delBtn.onclick = () => remove(child(messagesRef, msgKey));
+      msgDiv.appendChild(delBtn);
+    }
+
+    document.getElementById("chat-box").appendChild(msgDiv);
+    document.getElementById("chat-box").scrollTop = document.getElementById("chat-box").scrollHeight;
+  });
+
+  onValue(onlineRef, function(snapshot) {
+    const userList = document.getElementById("user-list");
+    userList.innerHTML = "";
+    const now = Date.now();
+
+    snapshot.forEach(child => {
+      const data = child.val();
+      if (now - data.timestamp < 30000) {
+        const div = document.createElement("div");
+        div.classList.add("user-item");
+        div.innerText = data.nick;
+        userList.appendChild(div);
       }
     });
-
-    onChildAdded(messagesRef, function(snapshot) {
-      const msg = snapshot.val();
-      const msgDiv = document.createElement("div");
-      const isMod = moderatorList.includes(msg.user);
-      msgDiv.classList.add("message", isMod ? "moderator" : "user");
-      msgDiv.innerHTML = `<strong>${msg.user}</strong> <small style="float:right">${msg.time}</small><br>${msg.text}`;
-      document.getElementById("chat-box").appendChild(msgDiv);
-      document.getElementById("chat-box").scrollTop = document.getElementById("chat-box").scrollHeight;
-    });
-
-    onValue(onlineRef, function(snapshot) {
-      const userList = document.getElementById("user-list");
-      userList.innerHTML = "";
-      const now = Date.now();
-
-      snapshot.forEach(child => {
-        const data = child.val();
-        if (now - data.timestamp < 30000) {
-          const div = document.createElement("div");
-          div.classList.add("user-item");
-          div.innerText = data.nick;
-          userList.appendChild(div);
-        }
-      });
-    });
-  </script>
-
+  });
+</script>
 </body>
 </html>
