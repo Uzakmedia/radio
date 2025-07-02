@@ -1,17 +1,6 @@
 // chat.js
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-import {
-  getDatabase,
-  ref,
-  push,
-  onChildAdded,
-  set,
-  onValue,
-  remove,
-  get,
-  child
-} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+import { getDatabase, ref, push, onChildAdded, set, onValue, remove, onChildRemoved } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBBBsr9Zjveq6MYdMuwVgAVGgEP_6AmPU0",
@@ -29,75 +18,102 @@ const messagesRef = ref(db, "messages");
 const onlineRef = ref(db, "onlineUsers");
 const bannedRef = ref(db, "bannedUsers");
 
-const moderatorList = ["admin", "serhat06", "faruk52", "sinan07"];
-let currentNick = localStorage.getItem("nickname") || "";
-let userKey = localStorage.getItem("userKey") || "";
-
 const nickPool = ["elma", "portakal", "mandalina", "avokado", "erik", "mango"];
+let nickname = localStorage.getItem("nickname") || `${nickPool[Math.floor(Math.random() * nickPool.length)]}_${Math.floor(Math.random() * 1000)}`;
+localStorage.setItem("nickname", nickname);
+const userKey = nickname.replace(/[^a-zA-Z0-9]/g, "") + "_" + Math.floor(Math.random() * 10000);
 
-function generateNick() {
-  let nick;
-  do {
-    nick = nickPool[Math.floor(Math.random() * nickPool.length)] + Math.floor(Math.random() * 1000);
-  } while (localStorage.getItem("usedNicks")?.includes(nick));
-  return nick;
-}
+const moderatorList = ["admin", "serhat06", "faruk52", "sinan07"];
+let isAdmin = moderatorList.includes(nickname);
 
-function initNick() {
-  if (!currentNick) {
-    currentNick = generateNick();
-    localStorage.setItem("nickname", currentNick);
+document.getElementById("nickname").innerText = `🧑 Takma adınız: ${nickname}`;
+
+document.getElementById("change-nick-button").addEventListener("click", () => {
+  const newNick = prompt("Yeni nickinizi girin (en az 3 karakter):");
+  if (newNick && newNick.length > 2) {
+    nickname = newNick;
+    localStorage.setItem("nickname", nickname);
+    document.getElementById("nickname").innerText = `🧑 Takma adınız: ${nickname}`;
+    isAdmin = moderatorList.includes(nickname);
+    setOnline();
   }
-  if (!userKey) {
-    userKey = currentNick + "_" + Math.floor(Math.random() * 10000);
-    localStorage.setItem("userKey", userKey);
+});
+
+document.getElementById("admin-login-button").addEventListener("click", () => {
+  const pass = prompt("Yönetici parolasını girin:");
+  if (pass === "uzakadmin2025") {
+    isAdmin = true;
+    alert("Admin girişi başarılı.");
+  } else {
+    alert("Parola hatalı.");
   }
-  document.getElementById("nickname").innerText = `🧑 Takma adınız: ${currentNick}`;
-  setOnline();
-}
+});
 
 function setOnline() {
   set(ref(db, `onlineUsers/${userKey}`), {
-    nick: currentNick,
+    nick: nickname,
     timestamp: Date.now()
   });
 }
 
-function checkBanAndStart() {
-  onValue(bannedRef, (snapshot) => {
-    const bans = snapshot.val() || {};
-    if (bans[currentNick]) {
-      alert("Bu kullanıcı adı yasaklanmıştır.");
-      return;
-    }
-    onChildAdded(messagesRef, displayMessage);
-    onValue(onlineRef, updateOnlineList);
-  });
-}
+setOnline();
+setInterval(setOnline, 20000);
 
-function displayMessage(snapshot) {
+window.addEventListener("beforeunload", () => {
+  remove(ref(db, `onlineUsers/${userKey}`));
+});
+
+document.getElementById("chat-form").addEventListener("submit", function(e) {
+  e.preventDefault();
+  const text = document.getElementById("message-input").value.trim();
+  if (text.length > 0) {
+    push(messagesRef, {
+      user: nickname,
+      text: text,
+      time: new Date().toLocaleTimeString("tr-TR")
+    });
+    document.getElementById("message-input").value = "";
+  }
+});
+
+onChildAdded(messagesRef, function(snapshot) {
   const msg = snapshot.val();
   const msgDiv = document.createElement("div");
   const isMod = moderatorList.includes(msg.user);
+
   msgDiv.classList.add("message", isMod ? "moderator" : "user");
-  if (msg.user === "admin") msgDiv.classList.add("admin");
   msgDiv.innerHTML = `<strong>${msg.user}</strong> <small style="float:right">${msg.time}</small><br>${msg.text}`;
-  if (isMod || msg.user === currentNick) {
+
+  if (isAdmin) {
     const delBtn = document.createElement("button");
+    delBtn.textContent = "Sil";
     delBtn.className = "delete-button";
-    delBtn.innerText = "Sil";
-    delBtn.onclick = () => remove(child(messagesRef, snapshot.key));
+    delBtn.onclick = () => remove(ref(db, `messages/${snapshot.key}`));
+
+    const banBtn = document.createElement("button");
+    banBtn.textContent = "Ban";
+    banBtn.className = "ban-button";
+    banBtn.onclick = () => set(ref(db, `bannedUsers/${msg.user}`), true);
+
     msgDiv.appendChild(delBtn);
+    msgDiv.appendChild(banBtn);
   }
+
   document.getElementById("chat-box").appendChild(msgDiv);
   document.getElementById("chat-box").scrollTop = document.getElementById("chat-box").scrollHeight;
-}
+});
 
-function updateOnlineList(snapshot) {
+onChildRemoved(messagesRef, function(snapshot) {
+  const chatBox = document.getElementById("chat-box");
+  chatBox.innerHTML = "";
+});
+
+onValue(onlineRef, function(snapshot) {
   const userList = document.getElementById("user-list");
   userList.innerHTML = "";
   const now = Date.now();
-  snapshot.forEach((child) => {
+
+  snapshot.forEach(child => {
     const data = child.val();
     if (now - data.timestamp < 30000) {
       const div = document.createElement("div");
@@ -106,49 +122,13 @@ function updateOnlineList(snapshot) {
       userList.appendChild(div);
     }
   });
-}
+});
 
-function sendMessage(e) {
-  e.preventDefault();
-  const text = document.getElementById("message-input").value.trim();
-  if (text.length > 0) {
-    push(messagesRef, {
-      user: currentNick,
-      text: text,
-      time: new Date().toLocaleTimeString("tr-TR")
-    });
-    document.getElementById("message-input").value = "";
+onValue(bannedRef, function(snapshot) {
+  const bannedUsers = snapshot.val() || {};
+  if (bannedUsers[nickname]) {
+    alert("Bu sohbetten banlandınız.");
+    document.getElementById("chat-form").style.display = "none";
+    document.getElementById("message-input").disabled = true;
   }
-}
-
-function changeNickname() {
-  const newNick = prompt("Yeni takma adınız?");
-  if (newNick && newNick.length > 2) {
-    currentNick = newNick;
-    localStorage.setItem("nickname", currentNick);
-    document.getElementById("nickname").innerText = `🧑 Takma adınız: ${currentNick}`;
-    setOnline();
-  }
-}
-
-function adminLogin() {
-  const pass = prompt("Admin şifresini girin:");
-  if (pass === "uzakadmin2025") {
-    currentNick = "admin";
-    localStorage.setItem("nickname", currentNick);
-    alert("Admin girişi başarılı. Artık mesaj silebilir ve banlayabilirsiniz.");
-    document.getElementById("nickname").innerText = `🧑 Takma adınız: ${currentNick}`;
-    setOnline();
-  } else {
-    alert("Hatalı şifre.");
-  }
-}
-
-document.getElementById("chat-form").addEventListener("submit", sendMessage);
-document.getElementById("change-nick-button").addEventListener("click", changeNickname);
-document.getElementById("admin-login-button").addEventListener("click", adminLogin);
-window.addEventListener("beforeunload", () => remove(ref(db, `onlineUsers/${userKey}`)));
-
-initNick();
-checkBanAndStart();
-setInterval(setOnline, 20000);
+});
