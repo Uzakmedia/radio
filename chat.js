@@ -1,6 +1,6 @@
 // chat.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, set, onValue, remove, onChildRemoved } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+import { getDatabase, ref, push, onChildAdded, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBBBsr9Zjveq6MYdMuwVgAVGgEP_6AmPU0",
@@ -16,38 +16,23 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const messagesRef = ref(db, "messages");
 const onlineRef = ref(db, "onlineUsers");
-const bannedRef = ref(db, "bannedUsers");
+const banRef = ref(db, "bannedIPs");
 
 const nickPool = ["elma", "portakal", "mandalina", "avokado", "erik", "mango"];
-let nickname = localStorage.getItem("nickname") || `${nickPool[Math.floor(Math.random() * nickPool.length)]}_${Math.floor(Math.random() * 1000)}`;
-localStorage.setItem("nickname", nickname);
-const userKey = nickname.replace(/[^a-zA-Z0-9]/g, "") + "_" + Math.floor(Math.random() * 10000);
-
 const moderatorList = ["admin", "serhat06", "faruk52", "sinan07"];
-let isAdmin = moderatorList.includes(nickname);
+
+let isAdmin = localStorage.getItem("isAdmin") === "true";
+let nickname = localStorage.getItem("nickname");
+
+if (!nickname) {
+  nickname = nickPool[Math.floor(Math.random() * nickPool.length)] + "_" + Math.floor(Math.random() * 10000);
+  localStorage.setItem("nickname", nickname);
+}
+
+const userKey = nickname;
+const ipKey = `ip_${nickname}`;
 
 document.getElementById("nickname").innerText = `🧑 Takma adınız: ${nickname}`;
-
-document.getElementById("change-nick-button").addEventListener("click", () => {
-  const newNick = prompt("Yeni nickinizi girin (en az 3 karakter):");
-  if (newNick && newNick.length > 2) {
-    nickname = newNick;
-    localStorage.setItem("nickname", nickname);
-    document.getElementById("nickname").innerText = `🧑 Takma adınız: ${nickname}`;
-    isAdmin = moderatorList.includes(nickname);
-    setOnline();
-  }
-});
-
-document.getElementById("admin-login-button").addEventListener("click", () => {
-  const pass = prompt("Yönetici parolasını girin:");
-  if (pass === "uzakadmin2025") {
-    isAdmin = true;
-    alert("Admin girişi başarılı.");
-  } else {
-    alert("Parola hatalı.");
-  }
-});
 
 function setOnline() {
   set(ref(db, `onlineUsers/${userKey}`), {
@@ -56,6 +41,15 @@ function setOnline() {
   });
 }
 
+function getIP() {
+  fetch("https://api.ipify.org?format=json")
+    .then(response => response.json())
+    .then(data => {
+      localStorage.setItem("userIP", data.ip);
+    });
+}
+
+getIP();
 setOnline();
 setInterval(setOnline, 20000);
 
@@ -67,45 +61,81 @@ document.getElementById("chat-form").addEventListener("submit", function(e) {
   e.preventDefault();
   const text = document.getElementById("message-input").value.trim();
   if (text.length > 0) {
-    push(messagesRef, {
+    const userIP = localStorage.getItem("userIP") || "unknown";
+    set(ref(db, `messages/${Date.now()}`), {
       user: nickname,
       text: text,
-      time: new Date().toLocaleTimeString("tr-TR")
+      time: new Date().toLocaleTimeString("tr-TR"),
+      ip: userIP
     });
     document.getElementById("message-input").value = "";
   }
 });
 
+document.getElementById("change-nick-button").addEventListener("click", function() {
+  const newNick = prompt("Yeni nickinizi girin:");
+  if (newNick && newNick.length > 2) {
+    localStorage.setItem("nickname", newNick);
+    location.reload();
+  }
+});
+
+document.getElementById("admin-login-button").addEventListener("click", function() {
+  const password = prompt("Admin şifresini girin:");
+  if (password === "uzak123") {
+    localStorage.setItem("isAdmin", "true");
+    isAdmin = true;
+    alert("Admin girişi başarılı");
+  } else {
+    alert("Hatalı şifre");
+  }
+});
+
 onChildAdded(messagesRef, function(snapshot) {
   const msg = snapshot.val();
+  const key = snapshot.key;
   const msgDiv = document.createElement("div");
   const isMod = moderatorList.includes(msg.user);
 
-  msgDiv.classList.add("message", isMod ? "moderator" : "user");
+  msgDiv.classList.add("message");
+  if (isMod) msgDiv.classList.add("moderator");
+  if (msg.user === "admin") msgDiv.classList.add("admin");
+  if (!isMod && msg.user !== "admin") msgDiv.classList.add("user");
+
   msgDiv.innerHTML = `<strong>${msg.user}</strong> <small style="float:right">${msg.time}</small><br>${msg.text}`;
 
   if (isAdmin) {
     const delBtn = document.createElement("button");
-    delBtn.textContent = "Sil";
+    delBtn.innerText = "Sil";
     delBtn.className = "delete-button";
-    delBtn.onclick = () => remove(ref(db, `messages/${snapshot.key}`));
+    delBtn.onclick = () => {
+      remove(ref(db, `messages/${key}`));
+    };
+    msgDiv.appendChild(delBtn);
 
     const banBtn = document.createElement("button");
-    banBtn.textContent = "Ban";
+    banBtn.innerText = "Ban";
     banBtn.className = "ban-button";
-    banBtn.onclick = () => set(ref(db, `bannedUsers/${msg.user}`), true);
-
-    msgDiv.appendChild(delBtn);
+    banBtn.onclick = () => {
+      if (msg.ip) {
+        set(ref(db, `bannedIPs/${msg.ip}`), true);
+        alert(`${msg.user} banlandı!`);
+      }
+    };
     msgDiv.appendChild(banBtn);
   }
 
+  const bannedIPsRef = ref(db, `bannedIPs/${msg.ip}`);
+  onValue(bannedIPsRef, function(snapshot) {
+    if (snapshot.exists()) {
+      alert("Bu IP adresi banlı olduğu için mesaj gönderemez.");
+      document.getElementById("message-input").disabled = true;
+      document.getElementById("send-button").disabled = true;
+    }
+  });
+
   document.getElementById("chat-box").appendChild(msgDiv);
   document.getElementById("chat-box").scrollTop = document.getElementById("chat-box").scrollHeight;
-});
-
-onChildRemoved(messagesRef, function(snapshot) {
-  const chatBox = document.getElementById("chat-box");
-  chatBox.innerHTML = "";
 });
 
 onValue(onlineRef, function(snapshot) {
@@ -122,13 +152,4 @@ onValue(onlineRef, function(snapshot) {
       userList.appendChild(div);
     }
   });
-});
-
-onValue(bannedRef, function(snapshot) {
-  const bannedUsers = snapshot.val() || {};
-  if (bannedUsers[nickname]) {
-    alert("Bu sohbetten banlandınız.");
-    document.getElementById("chat-form").style.display = "none";
-    document.getElementById("message-input").disabled = true;
-  }
 });
