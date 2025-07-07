@@ -115,7 +115,8 @@ onChildAdded(messagesRef, function(snapshot) {
 
   msgDiv.innerHTML = `<strong>${msg.user}</strong> <small style="float:right">${msg.time}</small><br>${msg.text}`;
 
-  if (isAdmin) {
+  // Silme ve Banlama yetkisi: admin VEYA moderator ise
+  if (isAdmin || isMod) {
     const delBtn = document.createElement("button");
     delBtn.innerText = "Sil";
     delBtn.className = "delete-button";
