@@ -111,16 +111,16 @@ onValue(messagesRef, function(snapshot) {
     const msg = childSnapshot.val();
     const key = childSnapshot.key;
     const msgDiv = document.createElement("div");
-    const isMod = moderatorList.includes(msg.user);
+    const isMod = moderatorList.includes(nickname);
 
     msgDiv.classList.add("message");
-    if (isMod) msgDiv.classList.add("moderator");
+    if (moderatorList.includes(msg.user)) msgDiv.classList.add("moderator");
     if (msg.user === "admin") msgDiv.classList.add("admin");
-    if (!isMod && msg.user !== "admin") msgDiv.classList.add("user");
+    if (!moderatorList.includes(msg.user) && msg.user !== "admin") msgDiv.classList.add("user");
 
     msgDiv.innerHTML = `<strong>${msg.user}</strong> <small style="float:right">${msg.time}</small><br>${msg.text}`;
 
-    if (isAdmin || isMod) {
+    if (isAdmin || isMod || msg.user === nickname) {
       const delBtn = document.createElement("button");
       delBtn.innerText = "Sil";
       delBtn.className = "delete-button";
@@ -128,7 +128,9 @@ onValue(messagesRef, function(snapshot) {
         remove(ref(db, `messages/${key}`));
       };
       msgDiv.appendChild(delBtn);
+    }
 
+    if (isAdmin || isMod) {
       const banBtn = document.createElement("button");
       banBtn.innerText = "Ban";
       banBtn.className = "ban-button";
@@ -144,7 +146,6 @@ onValue(messagesRef, function(snapshot) {
     const bannedIPsRef = ref(db, `bannedIPs/${msg.ip}`);
     onValue(bannedIPsRef, function(snapshot) {
       if (snapshot.exists()) {
-        alert("Bu IP adresi banlı olduğu için mesaj gönderemez.");
         document.getElementById("message-input").disabled = true;
         document.getElementById("send-button").disabled = true;
       }
