@@ -151,7 +151,7 @@
       outline: none;
     }
 
-    #send-button, #change-nick-button, #admin-login-button {
+    #send-button, #change-nick-button, #admin-login-button, #clear-chat-button {
       padding: 8px 10px;
       background: #007bff;
       color: white;
@@ -159,6 +159,12 @@
       border-radius: 5px;
       cursor: pointer;
       font-size: 0.9rem;
+    }
+
+    #clear-chat-button {
+      background: #990000;
+      margin-top: 10px;
+      display: none;
     }
 
     #nickname {
@@ -209,54 +215,11 @@
       api-url="https://radio.streemlion.com:4670/api/v2"
       server-id="1"
       station-name="Uzak Media"
-      station-url=""
-      imagecontainer="top"
-      imagecontainer-bg="#ffea00"
-      imagecontainer-bg-opacity="1"
-      controlscontainer="bottom"
-      controlscontainer-bg="#0011ff"
-      controlscontainer-bg-opacity="1"
-      controlscontainer-bg-img="https://radio.streemlion.com:4670/media/player_bg/player_bg.jpg"
-      historycontainer="both"
-      historycontainer-bg="#cdd8e5"
-      historycontainer-bg-opacity="1"
       :show-history="false"
-      history-limit="10"
-      sharecontainer="both"
-      sharecontainer-bg="#ffffff"
-      sharecontainer-bg-opacity="1"
       :show-share="false"
-      share-url=""
-      :share="['facebook','telegram','twitter']"
       :show-dj="false"
-      default-dj-img="https://radio.streemlion.com:4670/media/djs/dj.png"
       :show-image="false"
-      default-cover-image="https://radio.streemlion.com:4670/media/tracks/default_track_img.png"
-      play-button-color="#007bff"
-      play-button-bg="null"
-      visualizer-outline-color="#37679a"
-      visualizer-bar-width="1"
-      :channels-displayed="[1]"
-      channels-switch-bg="#4165b9"
-      channels-switch-color="#ffffff"
-      channels-switch-bg-active="#dddddd"
-      channels-switch-color-active="#000000"
-      :show-vote="false"
-      vote-buttons-color="#35495e"
-      vote-buttons-opacity="1"
-      vote-results-font-color="#FFFFFF"
-      vote-results-font-size="16"
-      :progress-show="false"
-      progress-bar-color="#35495e"
-      progress-bar-bg-color="#41b883"
-      progress-bar-bg-opacity="0.1"
-      progress-bar-bg-height="25"
-      progress-bar-opacity="1"
-      progress-font-color="#FFFFFF"
-      progress-font-size="12"
-      progress-bar-bg-radius="10"
-      progress-bar-bg-border="#F5F5F5"
-      player-width="360px"
+      player-width="300px"
     ></div>
   </div>
 
@@ -265,6 +228,7 @@
       <div id="nickname"></div>
       <button id="change-nick-button">Nickimi Değiştir</button>
       <button id="admin-login-button">Admin Girişi</button>
+      <button id="clear-chat-button">Chat'i Temizle</button>
       <div id="chat-box"></div>
       <form id="chat-form">
         <input type="text" id="message-input" placeholder="Mesajınızı yazın..." maxlength="200" required />
