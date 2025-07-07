@@ -1,6 +1,6 @@
 // chat.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBBBsr9Zjveq6MYdMuwVgAVGgEP_6AmPU0",
@@ -97,57 +97,63 @@ document.getElementById("admin-login-button").addEventListener("click", function
     localStorage.setItem("isAdmin", "true");
     isAdmin = true;
     alert("Admin girişi başarılı");
+    location.reload();
   } else {
     alert("Hatalı şifre");
   }
 });
 
-onChildAdded(messagesRef, function(snapshot) {
-  const msg = snapshot.val();
-  const key = snapshot.key;
-  const msgDiv = document.createElement("div");
-  const isMod = moderatorList.includes(msg.user);
+onValue(messagesRef, function(snapshot) {
+  const chatBox = document.getElementById("chat-box");
+  chatBox.innerHTML = "";
 
-  msgDiv.classList.add("message");
-  if (isMod) msgDiv.classList.add("moderator");
-  if (msg.user === "admin") msgDiv.classList.add("admin");
-  if (!isMod && msg.user !== "admin") msgDiv.classList.add("user");
+  snapshot.forEach(childSnapshot => {
+    const msg = childSnapshot.val();
+    const key = childSnapshot.key;
+    const msgDiv = document.createElement("div");
+    const isMod = moderatorList.includes(msg.user);
 
-  msgDiv.innerHTML = `<strong>${msg.user}</strong> <small style="float:right">${msg.time}</small><br>${msg.text}`;
+    msgDiv.classList.add("message");
+    if (isMod) msgDiv.classList.add("moderator");
+    if (msg.user === "admin") msgDiv.classList.add("admin");
+    if (!isMod && msg.user !== "admin") msgDiv.classList.add("user");
 
-  // Silme ve Banlama yetkisi: admin VEYA moderator ise
-  if (isAdmin || isMod) {
-    const delBtn = document.createElement("button");
-    delBtn.innerText = "Sil";
-    delBtn.className = "delete-button";
-    delBtn.onclick = () => {
-      remove(ref(db, `messages/${key}`));
-    };
-    msgDiv.appendChild(delBtn);
+    msgDiv.innerHTML = `<strong>${msg.user}</strong> <small style="float:right">${msg.time}</small><br>${msg.text}`;
 
-    const banBtn = document.createElement("button");
-    banBtn.innerText = "Ban";
-    banBtn.className = "ban-button";
-    banBtn.onclick = () => {
-      if (msg.ip) {
-        set(ref(db, `bannedIPs/${msg.ip}`), true);
-        alert(`${msg.user} banlandı!`);
-      }
-    };
-    msgDiv.appendChild(banBtn);
-  }
+    if (isAdmin || isMod) {
+      const delBtn = document.createElement("button");
+      delBtn.innerText = "Sil";
+      delBtn.className = "delete-button";
+      delBtn.onclick = () => {
+        remove(ref(db, `messages/${key}`));
+      };
+      msgDiv.appendChild(delBtn);
 
-  const bannedIPsRef = ref(db, `bannedIPs/${msg.ip}`);
-  onValue(bannedIPsRef, function(snapshot) {
-    if (snapshot.exists()) {
-      alert("Bu IP adresi banlı olduğu için mesaj gönderemez.");
-      document.getElementById("message-input").disabled = true;
-      document.getElementById("send-button").disabled = true;
+      const banBtn = document.createElement("button");
+      banBtn.innerText = "Ban";
+      banBtn.className = "ban-button";
+      banBtn.onclick = () => {
+        if (msg.ip) {
+          set(ref(db, `bannedIPs/${msg.ip}`), true);
+          alert(`${msg.user} banlandı!`);
+        }
+      };
+      msgDiv.appendChild(banBtn);
     }
+
+    const bannedIPsRef = ref(db, `bannedIPs/${msg.ip}`);
+    onValue(bannedIPsRef, function(snapshot) {
+      if (snapshot.exists()) {
+        alert("Bu IP adresi banlı olduğu için mesaj gönderemez.");
+        document.getElementById("message-input").disabled = true;
+        document.getElementById("send-button").disabled = true;
+      }
+    });
+
+    chatBox.appendChild(msgDiv);
   });
 
-  document.getElementById("chat-box").appendChild(msgDiv);
-  document.getElementById("chat-box").scrollTop = document.getElementById("chat-box").scrollHeight;
+  chatBox.scrollTop = chatBox.scrollHeight;
 });
 
 onValue(onlineRef, function(snapshot) {
@@ -156,7 +162,6 @@ onValue(onlineRef, function(snapshot) {
   const now = Date.now();
 
   const users = [];
-
   snapshot.forEach(child => {
     const data = child.val();
     if (now - data.timestamp < 30000) {
