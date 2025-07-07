@@ -24,7 +24,6 @@
       text-shadow: 0 0 8px #ffea00aa;
     }
 
-    /* === YAYIN AKIŞI === */
     .schedule {
       background-color: #1c1c1c;
       border: 1px solid #ffea00;
@@ -187,37 +186,6 @@
       font-size: 0.85rem;
       margin-bottom: 4px;
     }
-
-    /* === GALAKSİ ARKA PLAN === */
-    body::before, body::after {
-      content: "";
-      position: fixed;
-      top: 0;
-      width: 100px;
-      height: 100%;
-      background-repeat: no-repeat;
-      background-size: cover;
-      z-index: -1;
-      opacity: 0.1;
-      pointer-events: none;
-    }
-
-    body::before {
-      left: 0;
-      background-image: url('https://i.imgur.com/IUD8Q7v.png');
-    }
-
-    body::after {
-      right: 0;
-      background-image: url('https://i.imgur.com/FNMXxRc.png');
-    }
-
-    @media (max-width: 768px) {
-      body::before, body::after {
-        width: 50px;
-        opacity: 0.07;
-      }
-    }
   </style>
 </head>
 <body>
@@ -229,7 +197,7 @@
     <ul>
       <li>
         <span class="day">Gelecek canlı yayınlar bu alandan duyurulacaktır.</span>
-        <span class="time">Keyifli dinlemeler!</span> –
+        <span class="time">Keyifli dinlemeler!</span>
         <span class="desc"></span>
       </li>
     </ul>
@@ -242,53 +210,6 @@
       api-url="https://radio.streemlion.com:4670/api/v2"
       server-id="1"
       station-name="Uzak Media"
-      station-url=""
-      imagecontainer="top"
-      imagecontainer-bg="#ffea00"
-      imagecontainer-bg-opacity="1"
-      controlscontainer="bottom"
-      controlscontainer-bg="#0011ff"
-      controlscontainer-bg-opacity="1"
-      controlscontainer-bg-img="https://radio.streemlion.com:4670/media/player_bg/player_bg.jpg"
-      historycontainer="both"
-      historycontainer-bg="#cdd8e5"
-      historycontainer-bg-opacity="1"
-      :show-history="false"
-      history-limit="10"
-      sharecontainer="both"
-      sharecontainer-bg="#ffffff"
-      sharecontainer-bg-opacity="1"
-      :show-share="false"
-      share-url=""
-      :share="['facebook','telegram','twitter']"
-      :show-dj="false"
-      default-dj-img="https://radio.streemlion.com:4670/media/djs/dj.png"
-      :show-image="false"
-      default-cover-image="https://radio.streemlion.com:4670/media/tracks/default_track_img.png"
-      play-button-color="#007bff"
-      play-button-bg="null"
-      visualizer-outline-color="#37679a"
-      visualizer-bar-width="1"
-      :channels-displayed="[1]"
-      channels-switch-bg="#4165b9"
-      channels-switch-color="#ffffff"
-      channels-switch-bg-active="#dddddd"
-      channels-switch-color-active="#000000"
-      :show-vote="false"
-      vote-buttons-color="#35495e"
-      vote-buttons-opacity="1"
-      vote-results-font-color="#FFFFFF"
-      vote-results-font-size="16"
-      :progress-show="false"
-      progress-bar-color="#35495e"
-      progress-bar-bg-color="#41b883"
-      progress-bar-bg-opacity="0.1"
-      progress-bar-bg-height="25"
-      progress-bar-opacity="1"
-      progress-font-color="#FFFFFF"
-      progress-font-size="12"
-      progress-bar-bg-radius="10"
-      progress-bar-bg-border="#F5F5F5"
       player-width="360px"
     ></div>
   </div>
