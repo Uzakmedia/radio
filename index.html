@@ -13,13 +13,6 @@
       --wave-color: #ffea00;
     }
 
-    body.light {
-      --bg-color: #f4f4f4;
-      --text-color: #222;
-      --highlight: #007bff;
-      --wave-color: #007bff;
-    }
-
     body {
       background: var(--bg-color);
       color: var(--text-color);
@@ -38,16 +31,6 @@
       margin-bottom: 20px;
       color: var(--highlight);
       text-shadow: 0 0 8px var(--highlight);
-    }
-
-    .theme-toggle {
-      margin-bottom: 20px;
-      cursor: pointer;
-      background: none;
-      border: 1px solid var(--highlight);
-      color: var(--highlight);
-      padding: 5px 10px;
-      border-radius: 6px;
     }
 
     .radio-container {
@@ -104,13 +87,10 @@
       50% { height: 40px; }
     }
 
-    .schedule, .container {
+    .schedule {
       width: 100%;
       max-width: 500px;
       margin-top: 30px;
-    }
-
-    .schedule {
       background-color: #1c1c1c;
       border: 1px solid var(--highlight);
       padding: 15px;
@@ -147,7 +127,6 @@
 </head>
 <body>
   <h1>UZAK MEDIA</h1>
-  <button class="theme-toggle" onclick="toggleTheme()">🌓 Tema Değiştir</button>
 
   <div class="radio-container">
     <h2 class="radio-title">🎵 Şu an yayında</h2>
@@ -177,26 +156,6 @@
     </ul>
   </div>
 
-  <div class="container">
-    <div id="chat-area">
-      <div id="nickname"></div>
-      <button id="change-nick-button">Nickimi Değiştir</button>
-      <button id="admin-login-button">Admin Girişi</button>
-      <button id="clear-chat-button" style="display:none">Chat'i Temizle</button>
-      <div id="chat-box"></div>
-      <form id="chat-form">
-        <input type="text" id="message-input" placeholder="Mesajınızı yazın..." maxlength="200" required />
-        <button type="submit" id="send-button">Gönder</button>
-      </form>
-    </div>
-
-    <div id="online-users">
-      <h3>🔸 Çevrimiçi</h3>
-      <div id="user-list"></div>
-    </div>
-  </div>
-
-  <script type="module" src="chat.js"></script>
   <script>
     const audio = document.getElementById("stream");
     window.addEventListener("load", () => {
@@ -215,10 +174,6 @@
         });
       }
     });
-
-    function toggleTheme() {
-      document.body.classList.toggle("light");
-    }
   </script>
 </body>
 </html>
