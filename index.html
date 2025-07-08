@@ -5,251 +5,162 @@
   <title>Uzak Media</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    :root {
+      --bg-color: #0e0e0e;
+      --text-color: #ffffff;
+      --highlight: #ffea00;
+      --wave-color: #ffea00;
+    }
+
+    body.light {
+      --bg-color: #f4f4f4;
+      --text-color: #222;
+      --highlight: #007bff;
+      --wave-color: #007bff;
+    }
+
     body {
-      background: #0e0e0e;
-      color: white;
+      background: var(--bg-color);
+      color: var(--text-color);
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 20px 10px;
+      transition: background 0.6s, color 0.6s;
     }
 
     h1 {
       font-size: 2rem;
       letter-spacing: 2px;
       margin-bottom: 20px;
-      color: #ffea00;
-      text-shadow: 0 0 8px #ffea00aa;
+      color: var(--highlight);
+      text-shadow: 0 0 8px var(--highlight);
     }
 
-    .schedule {
-      background-color: #1c1c1c;
-      border: 1px solid #ffea00;
+    .theme-toggle {
+      margin-bottom: 20px;
+      cursor: pointer;
+      background: none;
+      border: 1px solid var(--highlight);
+      color: var(--highlight);
+      padding: 5px 10px;
+      border-radius: 6px;
+    }
+
+    .radio-container {
+      background: rgba(0,0,0,0.4);
+      border: 2px solid var(--highlight);
+      border-radius: 12px;
       padding: 15px;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 360px;
       margin-bottom: 30px;
-      box-shadow: 0 0 10px #ffea0044;
-    }
-
-    .schedule h2 {
-      color: #ffea00;
-      font-size: 1.2rem;
-      margin-bottom: 10px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 0 15px var(--highlight);
       text-align: center;
     }
 
-    .schedule ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
+    .radio-title {
+      font-size: 1.2rem;
+      color: var(--highlight);
+      margin-bottom: 10px;
     }
 
-    .schedule li {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px solid #444;
-      color: #fff;
-      font-size: 0.95rem;
-    }
-
-    .schedule .day {
-      color: #ffea00;
-      font-weight: bold;
-    }
-
-    .schedule .time {
-      color: #ffd700;
-      margin-left: 5px;
-    }
-
-    .schedule .desc {
-      font-style: italic;
-      color: #ccc;
-      margin-top: 5px;
-    }
-
-    #audio-player {
-      margin-bottom: 30px;
+    .player-box {
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      padding: 10px;
     }
 
     audio {
       width: 100%;
-      max-width: 360px;
-      border-radius: 6px;
-    }
-
-    .container {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      max-width: 500px;
-      gap: 20px;
-    }
-
-    #chat-area, #online-users {
-      width: 100%;
-    }
-
-    #chat-box {
-      background: #1b1b1b;
       border-radius: 8px;
-      padding: 10px;
-      height: 300px;
-      overflow-y: auto;
-      margin-bottom: 10px;
-    }
-
-    .message {
-      margin-bottom: 10px;
-      padding: 6px;
-      border-radius: 5px;
-      word-wrap: break-word;
-      position: relative;
-      font-size: 0.9rem;
-    }
-
-    .moderator {
-      background-color: #222f66;
-      color: #ffea00;
-    }
-
-    .user {
-      background-color: #292929;
-    }
-
-    .admin {
-      background-color: #661111;
-      color: #ffffff;
-    }
-
-    .delete-button, .ban-button {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      background: red;
-      color: white;
-      border: none;
-      border-radius: 3px;
-      padding: 2px 6px;
-      font-size: 0.7rem;
-      cursor: pointer;
-      margin-left: 5px;
-    }
-
-    #chat-form {
-      display: flex;
-      gap: 8px;
-    }
-
-    #message-input {
-      flex: 1;
-      padding: 8px;
-      border-radius: 5px;
-      border: none;
       outline: none;
     }
 
-    #send-button, #change-nick-button, #admin-login-button, #clear-chat-button {
-      padding: 8px 10px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+    .track-info {
       font-size: 0.9rem;
+      color: var(--text-color);
+      margin-top: 8px;
+      font-style: italic;
     }
 
-    #clear-chat-button {
-      background: #990000;
+    .wave {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
       margin-top: 10px;
-      display: none;
     }
 
-    #nickname {
-      font-size: 13px;
-      color: #bbb;
-      margin-bottom: 6px;
+    .bar {
+      width: 4px;
+      height: 20px;
+      background: var(--wave-color);
+      animation: pulse 1s infinite ease-in-out;
     }
 
-    #online-users {
-      background: #161616;
-      border-radius: 8px;
-      padding: 10px;
-      max-height: 200px;
-      overflow-y: auto;
+    .bar:nth-child(2) { animation-delay: 0.1s; }
+    .bar:nth-child(3) { animation-delay: 0.2s; }
+    .bar:nth-child(4) { animation-delay: 0.3s; }
+    .bar:nth-child(5) { animation-delay: 0.4s; }
+
+    @keyframes pulse {
+      0%, 100% { height: 20px; }
+      50% { height: 40px; }
     }
 
-    #online-users h3 {
-      font-size: 1rem;
-      margin-bottom: 8px;
-      border-bottom: 1px solid #444;
-      padding-bottom: 4px;
+    .pause-button {
+      margin-top: 12px;
+      padding: 6px 14px;
+      font-size: 0.9rem;
+      background: var(--highlight);
+      color: black;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
     }
 
-    .user-item {
-      font-size: 0.85rem;
-      margin-bottom: 4px;
+    .pause-button:hover {
+      opacity: 0.9;
     }
   </style>
 </head>
 <body>
   <h1>UZAK MEDIA</h1>
+  <button class="theme-toggle" onclick="toggleTheme()">🌓 Tema Değiştir</button>
 
-  <div class="schedule">
-    <h2>📻 Yayın Akışı</h2>
-    <ul>
-      <li>
-        <span class="day">Gelecek canlı yayınlar bu alandan duyurulacaktır.</span>
-        <span class="time">Keyifli dinlemeler!</span>
-        <span class="desc"></span>
-      </li>
-    </ul>
-  </div>
-
-  <!-- Player -->
-  <div id="audio-player">
-    <audio id="stream" preload="auto" controls autoplay>
-      <source src="https://radio.streemlion.com:4685/stream" type="audio/mpeg">
-      Tarayıcınız audio öğesini desteklemiyor.
-    </audio>
-  </div>
-
-  <!-- Chat -->
-  <div class="container">
-    <div id="chat-area">
-      <div id="nickname"></div>
-      <button id="change-nick-button">Nickimi Değiştir</button>
-      <button id="admin-login-button">Admin Girişi</button>
-      <button id="clear-chat-button">Chat'i Temizle</button>
-      <div id="chat-box"></div>
-      <form id="chat-form">
-        <input type="text" id="message-input" placeholder="Mesajınızı yazın..." maxlength="200" required />
-        <button type="submit" id="send-button">Gönder</button>
-      </form>
-    </div>
-
-    <div id="online-users">
-      <h3>🔸 Çevrimiçi</h3>
-      <div id="user-list"></div>
+  <div class="radio-container">
+    <h2 class="radio-title">🎵 Şu an yayında</h2>
+    
+    <div class="player-box">
+      <audio id="stream" preload="auto" controls autoplay>
+        <source src="https://radio.streemlion.com:4685/stream" type="audio/mpeg">
+        Tarayıcınız audio öğesini desteklemiyor.
+      </audio>
+      <div class="wave">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+      <div class="track-info" id="track-title">Yükleniyor...</div>
+      <button id="toggle-pause" class="pause-button">⏸ Duraklat</button>
     </div>
   </div>
-
-  <script type="module" src="chat.js"></script>
 
   <script>
     const audio = document.getElementById("stream");
+    const pauseBtn = document.getElementById("toggle-pause");
 
+    // Otomatik oynatma desteklenmiyorsa ilk tıklamada tetikle
     window.addEventListener("load", () => {
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise.catch(() => {
-          console.log("Autoplay engellendi. İlk tıklamada tekrar deneniyor.");
+          console.log("Autoplay engellendi. Tıklamayla tetiklenecek.");
         });
       }
     });
@@ -261,6 +172,37 @@
         });
       }
     });
+
+    // Duraklat / Devam et butonu
+    pauseBtn.addEventListener("click", () => {
+      if (audio.paused) {
+        audio.play();
+        pauseBtn.innerText = "⏸ Duraklat";
+      } else {
+        audio.pause();
+        pauseBtn.innerText = "▶️ Devam";
+      }
+    });
+
+    // Şarkı bilgisi çekme
+    async function fetchTrackInfo() {
+      try {
+        const response = await fetch("https://radio.streemlion.com:4670/api/v2/nowplaying/1");
+        const data = await response.json();
+        const trackTitle = data?.now_playing?.song?.text || "Canlı yayın";
+        document.getElementById("track-title").innerText = trackTitle;
+      } catch (e) {
+        document.getElementById("track-title").innerText = "Şarkı bilgisi alınamadı";
+      }
+    }
+
+    setInterval(fetchTrackInfo, 10000);
+    fetchTrackInfo();
+
+    // Tema geçişi
+    function toggleTheme() {
+      document.body.classList.toggle("light");
+    }
   </script>
 </body>
 </html>
