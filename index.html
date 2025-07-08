@@ -74,12 +74,6 @@
       margin-top: 5px;
     }
 
-    #sc-player {
-      width: 100%;
-      max-width: 360px;
-      margin-bottom: 30px;
-    }
-
     .container {
       display: flex;
       flex-direction: column;
@@ -192,6 +186,16 @@
       font-size: 0.85rem;
       margin-bottom: 4px;
     }
+
+    #audio-player {
+      margin-bottom: 30px;
+    }
+
+    audio {
+      width: 100%;
+      max-width: 360px;
+      border-radius: 6px;
+    }
   </style>
 </head>
 <body>
@@ -208,19 +212,11 @@
     </ul>
   </div>
 
-  <div id="sc-player">
-    <div
-      is="player"
-      lang="en"
-      api-url="https://radio.streemlion.com:4670/api/v2"
-      server-id="1"
-      station-name="Uzak Media"
-      :show-history="false"
-      :show-share="false"
-      :show-dj="false"
-      :show-image="false"
-      player-width="360px"
-    ></div>
+  <div id="audio-player">
+    <audio id="stream" autoplay controls>
+      <source src="https://radio.streemlion.com:4685/stream" type="audio/mpeg">
+      Tarayıcınız audio öğesini desteklemiyor.
+    </audio>
   </div>
 
   <div class="container">
@@ -242,7 +238,17 @@
     </div>
   </div>
 
-  <script src="https://radio.streemlion.com:4670/media/static/js/sc_player/sc_player.js"></script>
   <script type="module" src="chat.js"></script>
+  <script>
+    window.addEventListener("load", () => {
+      const audio = document.getElementById("stream");
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.log("Otomatik çalma engellendi. Kullanıcı etkileşimi gerekli.");
+        });
+      }
+    });
+  </script>
 </body>
 </html>
