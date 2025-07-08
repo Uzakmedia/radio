@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Uzak Media</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
   <style>
     :root {
       --bg-color: #0e0e0e;
@@ -79,13 +80,6 @@
       outline: none;
     }
 
-    .track-info {
-      font-size: 0.9rem;
-      color: var(--text-color);
-      margin-top: 8px;
-      font-style: italic;
-    }
-
     .wave {
       display: flex;
       justify-content: center;
@@ -110,21 +104,45 @@
       50% { height: 40px; }
     }
 
-    .pause-button {
-      margin-top: 12px;
-      padding: 6px 14px;
-      font-size: 0.9rem;
-      background: var(--highlight);
-      color: black;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.3s;
+    .schedule, .container {
+      width: 100%;
+      max-width: 500px;
+      margin-top: 30px;
     }
 
-    .pause-button:hover {
-      opacity: 0.9;
+    .schedule {
+      background-color: #1c1c1c;
+      border: 1px solid var(--highlight);
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px var(--highlight);
+      margin-bottom: 30px;
     }
+
+    .schedule h2 {
+      color: var(--highlight);
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .schedule ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .schedule li {
+      text-align: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #444;
+      color: var(--text-color);
+      font-size: 0.95rem;
+    }
+
+    .schedule .day { font-weight: bold; color: var(--highlight); }
+    .schedule .time { color: #ffd700; margin-left: 5px; }
+    .schedule .desc { font-style: italic; color: #ccc; margin-top: 5px; }
   </style>
 </head>
 <body>
@@ -133,7 +151,6 @@
 
   <div class="radio-container">
     <h2 class="radio-title">🎵 Şu an yayında</h2>
-    
     <div class="player-box">
       <audio id="stream" preload="auto" controls autoplay>
         <source src="https://radio.streemlion.com:4685/stream" type="audio/mpeg">
@@ -146,16 +163,42 @@
         <div class="bar"></div>
         <div class="bar"></div>
       </div>
-      <div class="track-info" id="track-title">Yükleniyor...</div>
-      <button id="toggle-pause" class="pause-button">⏸ Duraklat</button>
     </div>
   </div>
 
+  <div class="schedule">
+    <h2>📻 Yayın Akışı</h2>
+    <ul>
+      <li>
+        <span class="day">Gelecek canlı yayınlar bu alandan duyurulacaktır.</span>
+        <span class="time">Keyifli dinlemeler!</span>
+        <span class="desc"></span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="container">
+    <div id="chat-area">
+      <div id="nickname"></div>
+      <button id="change-nick-button">Nickimi Değiştir</button>
+      <button id="admin-login-button">Admin Girişi</button>
+      <button id="clear-chat-button" style="display:none">Chat'i Temizle</button>
+      <div id="chat-box"></div>
+      <form id="chat-form">
+        <input type="text" id="message-input" placeholder="Mesajınızı yazın..." maxlength="200" required />
+        <button type="submit" id="send-button">Gönder</button>
+      </form>
+    </div>
+
+    <div id="online-users">
+      <h3>🔸 Çevrimiçi</h3>
+      <div id="user-list"></div>
+    </div>
+  </div>
+
+  <script type="module" src="chat.js"></script>
   <script>
     const audio = document.getElementById("stream");
-    const pauseBtn = document.getElementById("toggle-pause");
-
-    // Otomatik oynatma desteklenmiyorsa ilk tıklamada tetikle
     window.addEventListener("load", () => {
       const playPromise = audio.play();
       if (playPromise !== undefined) {
@@ -173,33 +216,6 @@
       }
     });
 
-    // Duraklat / Devam et butonu
-    pauseBtn.addEventListener("click", () => {
-      if (audio.paused) {
-        audio.play();
-        pauseBtn.innerText = "⏸ Duraklat";
-      } else {
-        audio.pause();
-        pauseBtn.innerText = "▶️ Devam";
-      }
-    });
-
-    // Şarkı bilgisi çekme
-    async function fetchTrackInfo() {
-      try {
-        const response = await fetch("https://radio.streemlion.com:4670/api/v2/nowplaying/1");
-        const data = await response.json();
-        const trackTitle = data?.now_playing?.song?.text || "Canlı yayın";
-        document.getElementById("track-title").innerText = trackTitle;
-      } catch (e) {
-        document.getElementById("track-title").innerText = "Şarkı bilgisi alınamadı";
-      }
-    }
-
-    setInterval(fetchTrackInfo, 10000);
-    fetchTrackInfo();
-
-    // Tema geçişi
     function toggleTheme() {
       document.body.classList.toggle("light");
     }
