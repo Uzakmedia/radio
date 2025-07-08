@@ -10,6 +10,7 @@
       --text-color: #ffffff;
       --highlight: #ffea00;
       --wave-color: #ffea00;
+      --button-color: #ffea00;
     }
 
     body {
@@ -21,7 +22,6 @@
       flex-direction: column;
       align-items: center;
       padding: 20px 10px;
-      transition: background 0.6s, color 0.6s;
     }
 
     h1 {
@@ -33,45 +33,49 @@
     }
 
     .radio-container {
-      background: rgba(0,0,0,0.4);
+      background: rgba(255, 255, 255, 0.05);
       border: 2px solid var(--highlight);
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 30px;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 40px;
       width: 100%;
       max-width: 400px;
-      box-shadow: 0 0 15px var(--highlight);
+      box-shadow: 0 0 20px var(--highlight);
       text-align: center;
+      position: relative;
     }
 
     .radio-title {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
+      margin-bottom: 15px;
       color: var(--highlight);
-      margin-bottom: 10px;
-    }
-
-    .player-box {
-      background: rgba(255,255,255,0.05);
-      border-radius: 10px;
-      padding: 10px;
     }
 
     audio {
       width: 100%;
+      max-width: 100%;
       border-radius: 8px;
       outline: none;
+      margin-bottom: 10px;
+    }
+
+    .play-hint {
+      font-size: 0.95rem;
+      color: #ccc;
+      margin-top: 8px;
+      font-style: italic;
     }
 
     .wave {
       display: flex;
       justify-content: center;
-      gap: 4px;
-      margin-top: 10px;
+      gap: 5px;
+      margin-top: 12px;
     }
 
     .bar {
-      width: 4px;
-      height: 20px;
+      width: 5px;
+      height: 18px;
       background: var(--wave-color);
       animation: pulse 1s infinite ease-in-out;
     }
@@ -82,20 +86,18 @@
     .bar:nth-child(5) { animation-delay: 0.4s; }
 
     @keyframes pulse {
-      0%, 100% { height: 20px; }
-      50% { height: 40px; }
+      0%, 100% { height: 18px; }
+      50% { height: 36px; }
     }
 
     .schedule {
-      width: 100%;
-      max-width: 500px;
-      margin-top: 30px;
       background-color: #1c1c1c;
       border: 1px solid var(--highlight);
       padding: 15px;
       border-radius: 10px;
       box-shadow: 0 0 10px var(--highlight);
-      margin-bottom: 30px;
+      width: 100%;
+      max-width: 500px;
     }
 
     .schedule h2 {
@@ -128,20 +130,19 @@
   <h1>UZAK MEDIA</h1>
 
   <div class="radio-container">
-    <h2 class="radio-title">🎵 Şu an yayında</h2>
-    <div class="player-box">
-      <audio id="stream" preload="auto" controls autoplay muted>
-        <source src="https://radio.streemlion.com:4685/stream" type="audio/mpeg">
-        Tarayıcınız audio öğesini desteklemiyor.
-      </audio>
-      <div class="wave">
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-      </div>
+    <div class="radio-title">🎧 Şu an yayında</div>
+    <audio id="stream" preload="none" controls>
+      <source src="https://radio.streemlion.com:4685/stream" type="audio/mpeg">
+      Tarayıcınız audio öğesini desteklemiyor.
+    </audio>
+    <div class="wave">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
     </div>
+    <div class="play-hint">▶️ Dinlemek için oynat butonuna tıklayın</div>
   </div>
 
   <div class="schedule">
@@ -150,38 +151,8 @@
       <li>
         <span class="day">Gelecek canlı yayınlar bu alandan duyurulacaktır.</span>
         <span class="time">Keyifli dinlemeler!</span>
-        <span class="desc"></span>
       </li>
     </ul>
   </div>
-
-  <script>
-    const audio = document.getElementById("stream");
-
-    function unlockAudio() {
-      audio.muted = false;
-      audio.play().then(() => {
-        console.log("Çalma başarıyla başlatıldı.");
-      }).catch(err => {
-        console.log("Manuel çalma da engellendi:", err);
-      });
-      document.removeEventListener("click", unlockAudio);
-      document.removeEventListener("touchstart", unlockAudio);
-    }
-
-    window.addEventListener("load", () => {
-      const promise = audio.play();
-      if (promise !== undefined) {
-        promise
-          .then(() => {
-            audio.muted = false;
-          })
-          .catch(() => {
-            document.addEventListener("click", unlockAudio);
-            document.addEventListener("touchstart", unlockAudio);
-          });
-      }
-    });
-  </script>
 </body>
 </html>
