@@ -4,13 +4,16 @@
   <meta charset="UTF-8">
   <title>Uzak Media</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Basit "U" harfli favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 font-family=%22Arial%22>U</text></svg>">
+
   <style>
     :root {
       --bg-color: #0e0e0e;
       --text-color: #ffffff;
       --highlight: #ffea00;
       --wave-color: #ffea00;
-      --button-color: #ffea00;
     }
 
     body {
@@ -33,49 +36,52 @@
     }
 
     .radio-container {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(0, 0, 0, 0.5);
       border: 2px solid var(--highlight);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 40px;
+      border-radius: 12px;
+      padding: 20px 15px;
+      margin-bottom: 30px;
       width: 100%;
-      max-width: 400px;
-      box-shadow: 0 0 20px var(--highlight);
+      max-width: 420px;
+      box-shadow: 0 0 15px var(--highlight);
       text-align: center;
-      position: relative;
     }
 
     .radio-title {
       font-size: 1.3rem;
-      margin-bottom: 15px;
       color: var(--highlight);
+      margin-bottom: 12px;
+    }
+
+    .player-box {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 12px;
     }
 
     audio {
       width: 100%;
-      max-width: 100%;
-      border-radius: 8px;
-      outline: none;
-      margin-bottom: 10px;
+      height: 60px;
+      border-radius: 10px;
+      background-color: #222;
+      padding: 5px;
     }
 
-    .play-hint {
-      font-size: 0.95rem;
-      color: #ccc;
-      margin-top: 8px;
-      font-style: italic;
+    audio::-webkit-media-controls-play-button {
+      transform: scale(1.6);
+      filter: drop-shadow(0 0 3px var(--highlight));
     }
 
     .wave {
       display: flex;
       justify-content: center;
       gap: 5px;
-      margin-top: 12px;
+      margin-top: 10px;
     }
 
     .bar {
-      width: 5px;
-      height: 18px;
+      width: 4px;
+      height: 20px;
       background: var(--wave-color);
       animation: pulse 1s infinite ease-in-out;
     }
@@ -86,18 +92,18 @@
     .bar:nth-child(5) { animation-delay: 0.4s; }
 
     @keyframes pulse {
-      0%, 100% { height: 18px; }
-      50% { height: 36px; }
+      0%, 100% { height: 20px; }
+      50% { height: 40px; }
     }
 
     .schedule {
+      width: 100%;
+      max-width: 500px;
       background-color: #1c1c1c;
       border: 1px solid var(--highlight);
       padding: 15px;
       border-radius: 10px;
       box-shadow: 0 0 10px var(--highlight);
-      width: 100%;
-      max-width: 500px;
     }
 
     .schedule h2 {
@@ -130,19 +136,20 @@
   <h1>UZAK MEDIA</h1>
 
   <div class="radio-container">
-    <div class="radio-title">🎧 Şu an yayında</div>
-    <audio id="stream" preload="none" controls>
-      <source src="https://radio.streemlion.com:4685/stream" type="audio/mpeg">
-      Tarayıcınız audio öğesini desteklemiyor.
-    </audio>
-    <div class="wave">
-      <div class="bar"></div>
-      <div class="bar"></div>
-      <div class="bar"></div>
-      <div class="bar"></div>
-      <div class="bar"></div>
+    <h2 class="radio-title">🎵 Şu an yayında</h2>
+    <div class="player-box">
+      <audio id="stream" preload="none" controls>
+        <source src="https://radio.streemlion.com:4685/stream" type="audio/mpeg">
+        Tarayıcınız bu ses biçimini desteklemiyor.
+      </audio>
+      <div class="wave">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
     </div>
-    <div class="play-hint">▶️ Dinlemek için oynat butonuna tıklayın</div>
   </div>
 
   <div class="schedule">
@@ -151,6 +158,7 @@
       <li>
         <span class="day">Gelecek canlı yayınlar bu alandan duyurulacaktır.</span>
         <span class="time">Keyifli dinlemeler!</span>
+        <span class="desc"></span>
       </li>
     </ul>
   </div>
