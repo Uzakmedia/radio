@@ -1,4 +1,3 @@
-// chat.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
 import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
@@ -30,8 +29,6 @@ if (!nickname) {
 }
 
 const userKey = nickname;
-const ipKey = `ip_${nickname}`;
-
 document.getElementById("nickname").innerText = `🧑 Takma adınız: ${nickname}`;
 
 function setOnline() {
@@ -57,12 +54,12 @@ window.addEventListener("beforeunload", () => {
   remove(ref(db, `onlineUsers/${userKey}`));
 });
 
-document.getElementById("chat-form").addEventListener("submit", function(e) {
+document.getElementById("chat-form").addEventListener("submit", function (e) {
   e.preventDefault();
   sendMessage();
 });
 
-document.getElementById("message-input").addEventListener("keypress", function(e) {
+document.getElementById("message-input").addEventListener("keypress", function (e) {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     sendMessage();
@@ -83,7 +80,7 @@ function sendMessage() {
   }
 }
 
-document.getElementById("change-nick-button").addEventListener("click", function() {
+document.getElementById("change-nick-button").addEventListener("click", function () {
   const newNick = prompt("Yeni nickinizi girin:");
   if (newNick && newNick.length > 2) {
     localStorage.setItem("nickname", newNick);
@@ -91,19 +88,30 @@ document.getElementById("change-nick-button").addEventListener("click", function
   }
 });
 
-document.getElementById("admin-login-button").addEventListener("click", function() {
+document.getElementById("admin-login-button").addEventListener("click", function () {
   const password = prompt("Admin şifresini girin:");
   if (password === "uzak123!6852") {
     localStorage.setItem("isAdmin", "true");
     isAdmin = true;
     alert("Admin girişi başarılı");
-    location.reload();
+    document.getElementById("clear-chat-button").style.display = "inline-block";
   } else {
     alert("Hatalı şifre");
   }
 });
 
-onValue(messagesRef, function(snapshot) {
+document.getElementById("clear-chat-button").addEventListener("click", function () {
+  if (confirm("Tüm mesajlar silinecek. Emin misiniz?")) {
+    remove(ref(db, "messages")).then(() => {
+      document.getElementById("chat-box").innerHTML = "";
+      alert("Tüm mesajlar silindi.");
+    }).catch((error) => {
+      alert("Silme hatası: " + error.message);
+    });
+  }
+});
+
+onValue(messagesRef, function (snapshot) {
   const chatBox = document.getElementById("chat-box");
   chatBox.innerHTML = "";
 
@@ -144,7 +152,7 @@ onValue(messagesRef, function(snapshot) {
     }
 
     const bannedIPsRef = ref(db, `bannedIPs/${msg.ip}`);
-    onValue(bannedIPsRef, function(snapshot) {
+    onValue(bannedIPsRef, function (snapshot) {
       if (snapshot.exists()) {
         document.getElementById("message-input").disabled = true;
         document.getElementById("send-button").disabled = true;
@@ -157,23 +165,18 @@ onValue(messagesRef, function(snapshot) {
   chatBox.scrollTop = chatBox.scrollHeight;
 });
 
-onValue(onlineRef, function(snapshot) {
+onValue(onlineRef, function (snapshot) {
   const userList = document.getElementById("user-list");
   userList.innerHTML = "";
   const now = Date.now();
 
-  const users = [];
   snapshot.forEach(child => {
     const data = child.val();
     if (now - data.timestamp < 30000) {
-      users.push(data.nick);
+      const div = document.createElement("div");
+      div.classList.add("user-item");
+      div.innerText = data.nick;
+      userList.appendChild(div);
     }
-  });
-
-  users.forEach(nick => {
-    const div = document.createElement("div");
-    div.classList.add("user-item");
-    div.innerText = nick;
-    userList.appendChild(div);
   });
 });
