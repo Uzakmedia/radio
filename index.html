@@ -74,6 +74,16 @@
       margin-top: 5px;
     }
 
+    #audio-player {
+      margin-bottom: 30px;
+    }
+
+    audio {
+      width: 100%;
+      max-width: 360px;
+      border-radius: 6px;
+    }
+
     .container {
       display: flex;
       flex-direction: column;
@@ -186,16 +196,6 @@
       font-size: 0.85rem;
       margin-bottom: 4px;
     }
-
-    #audio-player {
-      margin-bottom: 30px;
-    }
-
-    audio {
-      width: 100%;
-      max-width: 360px;
-      border-radius: 6px;
-    }
   </style>
 </head>
 <body>
@@ -212,13 +212,15 @@
     </ul>
   </div>
 
+  <!-- Player -->
   <div id="audio-player">
-    <audio id="stream" autoplay controls>
+    <audio id="stream" preload="auto" controls autoplay>
       <source src="https://radio.streemlion.com:4685/stream" type="audio/mpeg">
       Tarayıcınız audio öğesini desteklemiyor.
     </audio>
   </div>
 
+  <!-- Chat -->
   <div class="container">
     <div id="chat-area">
       <div id="nickname"></div>
@@ -239,13 +241,23 @@
   </div>
 
   <script type="module" src="chat.js"></script>
+
   <script>
+    const audio = document.getElementById("stream");
+
     window.addEventListener("load", () => {
-      const audio = document.getElementById("stream");
       const playPromise = audio.play();
       if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.log("Otomatik çalma engellendi. Kullanıcı etkileşimi gerekli.");
+        playPromise.catch(() => {
+          console.log("Autoplay engellendi. İlk tıklamada tekrar deneniyor.");
+        });
+      }
+    });
+
+    document.body.addEventListener("click", () => {
+      if (audio.paused) {
+        audio.play().catch(() => {
+          console.log("Manuel çalma da engellendi.");
         });
       }
     });
