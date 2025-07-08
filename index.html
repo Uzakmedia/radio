@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Uzak Media</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
   <style>
     :root {
       --bg-color: #0e0e0e;
@@ -131,7 +130,7 @@
   <div class="radio-container">
     <h2 class="radio-title">🎵 Şu an yayında</h2>
     <div class="player-box">
-      <audio id="stream" preload="auto" controls autoplay>
+      <audio id="stream" preload="auto" controls autoplay muted>
         <source src="https://radio.streemlion.com:4685/stream" type="audio/mpeg">
         Tarayıcınız audio öğesini desteklemiyor.
       </audio>
@@ -158,20 +157,29 @@
 
   <script>
     const audio = document.getElementById("stream");
-    window.addEventListener("load", () => {
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          console.log("Autoplay engellendi. Tıklamayla tetiklenecek.");
-        });
-      }
-    });
 
-    document.body.addEventListener("click", () => {
-      if (audio.paused) {
-        audio.play().catch(() => {
-          console.log("Manuel çalma da engellendi.");
-        });
+    function unlockAudio() {
+      audio.muted = false;
+      audio.play().then(() => {
+        console.log("Çalma başarıyla başlatıldı.");
+      }).catch(err => {
+        console.log("Manuel çalma da engellendi:", err);
+      });
+      document.removeEventListener("click", unlockAudio);
+      document.removeEventListener("touchstart", unlockAudio);
+    }
+
+    window.addEventListener("load", () => {
+      const promise = audio.play();
+      if (promise !== undefined) {
+        promise
+          .then(() => {
+            audio.muted = false;
+          })
+          .catch(() => {
+            document.addEventListener("click", unlockAudio);
+            document.addEventListener("touchstart", unlockAudio);
+          });
       }
     });
   </script>
